@@ -4,20 +4,23 @@ import prisma from "../prisma/client";
 export const createGroup = async (req: Request, res: Response) => {
   try {
     const { grade, group } = req.body;
-
     if (!grade || !group) {
       res.status(400).json({ error: "Анги болон бүлэг заавал хэрэгтэй!" });
       return;
     }
-
     const gradeNumber = parseInt(grade);
-    let existingGrade = await prisma.grade.findUnique({
+    let existingGrade = await prisma.grade.findFirst({
       where: { number: gradeNumber },
     });
 
     if (!existingGrade) {
       existingGrade = await prisma.grade.create({
-        data: { number: gradeNumber },
+        data: {
+          number: gradeNumber,
+          school: {
+            connect: { id: "schoolId" },
+          },
+        },
       });
     }
 
