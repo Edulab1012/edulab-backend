@@ -51,6 +51,7 @@ model Grade {
   schoolId String?
   school   School?   @relation(fields: [schoolId], references: [id])
   teachers Teacher[]
+  Student  Student[]
 }
 
 model Group {
@@ -79,20 +80,21 @@ model Teacher {
 }
 
 model Student {
-  id              String  @id @default(uuid())
+  id              String       @id @default(uuid())
   firstName       String
   lastName        String
-  email           String? @unique
+  email           String?      @unique
   phoneNumber     String?
   emergencyNumber String?
   teacherId       String?
   groupId         String
   parentId        String?
-
-  group      Group?       @relation(fields: [groupId], references: [id])
-  parent     Parent?      @relation(fields: [parentId], references: [id])
-  attendance Attendance[]
-  scores     Score[]
+  grade           Grade        @relation(fields: [gradeId], references: [id])
+  gradeId         String
+  group           Group?       @relation(fields: [groupId], references: [id])
+  parent          Parent?      @relation(fields: [parentId], references: [id])
+  attendance      Attendance[]
+  scores          Score[]
 
   user User? @relation("StudentUser")
 }
