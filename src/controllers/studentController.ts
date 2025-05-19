@@ -62,12 +62,12 @@ export const addStudent = async (req: Request, res: Response) => {
 
 export const getTeacherWithStudents = async (req: Request, res: Response) => {
   const { teacherId } = req.params;
-
+  console.log(teacherId);
   try {
     const teacher = await prisma.teacher.findUnique({
       where: { id: teacherId },
     });
-
+    console.log(teacher);
     if (!teacher || !teacher.groupId) {
       res
         .status(404)

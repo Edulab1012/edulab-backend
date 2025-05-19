@@ -1,7 +1,3 @@
-// 🧩 Энэ файл нь Prisma-ийн schema — өгөгдлийн сангийн хүснэгт, талбар, холбоо зэргийг энд тодорхойлдог
-// 🛠 Schema-г өөрчилсний дараа `npx prisma migrate dev` эсвэл `npx prisma db push` командыг ашиглана !!!
-// 🚀 Дараа нь backend API эсвэл service(src/controllers , src/routes ...) файлуудаа бичиж өгөгдөлтэй ажиллана 
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -18,22 +14,6 @@ enum UserRole {
   admin
 }
 
-// //Class = Анги , Group = Бүлэг
-// enum Class {
-//   one
-//   two
-//   three
-//   four
-//   five
-//   six
-//   seven
-//   eight
-//   nine
-//   ten
-//   eleven
-//   twelve
-// }
-
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -47,43 +27,41 @@ model School {
   id        String   @id @default(uuid())
   name      String
   email     String   @unique
-  grades    Grade[]
   createdAt DateTime @default(now())
+  grades    Grade[]
 }
 
 model Grade {
   id       String    @id @default(uuid())
-  number   Int // 1 to 12
-  groups   Group[]
+  number   Int
   schoolId String
   school   School    @relation(fields: [schoolId], references: [id])
-  Teacher  Teacher[]
+  groups   Group[]
+  teachers Teacher[]
 }
 
 model Group {
   id       String    @id @default(uuid())
-  name     String // a, b, c, d, e
+  name     String
   gradeId  String
   grade    Grade     @relation(fields: [gradeId], references: [id])
   students Student[]
-  Teacher  Teacher[]
+  teachers Teacher[]
 }
 
 model Teacher {
-  id        String @id @default(uuid())
-  firstName String
-  lastName  String
-  email     String @unique
-  password  String @default("teacher1234")
-
-  gradeId String?
-  grade   Grade?  @relation(fields: [gradeId], references: [id])
-
-  groupId String?
-  group   Group?  @relation(fields: [groupId], references: [id])
-
-  phoneNumber     String?
+  id              String    @id @default(uuid())
+  firstName       String
+  lastName        String
+  email           String    @unique
+  password        String    @default("teacher1234")
+  groupId         String?
+  gradeId         String?
   emergencyNumber String?
+  phoneNumber     String?
+  grade           Grade?    @relation(fields: [gradeId], references: [id])
+  group           Group?    @relation(fields: [groupId], references: [id])
+  students        Student[]
 }
 
 model Student {
@@ -95,11 +73,12 @@ model Student {
   emergencyNumber String?
   teacherId       String?
   groupId         String
-  group           Group?       @relation(fields: [groupId], references: [id])
-  parent          Parent?      @relation(fields: [parentId], references: [id])
   parentId        String?
   attendance      Attendance[]
   scores          Score[]
+  group           Group        @relation(fields: [groupId], references: [id])
+  teacher         Teacher?     @relation(fields: [teacherId], references: [id])
+  parent          Parent?      @relation(fields: [parentId], references: [id])
 }
 
 model Parent {
