@@ -1,57 +1,73 @@
 import { Request, Response } from "express";
 import prisma from "../prisma/client";
-
+import jwt from "jsonwebtoken";
+interface JwtPayload {
+  id: string;
+  role: string;
+  teacherId?: string;
+  groupId?: string;
+  gradeId?: string;
+}
+const JWT_SECRET = "my_super_secret_key_123456";
 export const addStudent = async (req: Request, res: Response) => {
-  const {
-    teacherId,
-    firstName,
-    lastName,
-    email,
-    phoneNumber,
-    emergencyNumber,
-  } = req.body;
+  const { firstName, lastName, email, phoneNumber, emergencyNumber } = req.body;
 
   try {
-    const teacher = await prisma.teacher.findUnique({
-      where: { id: "52aca953-dd89-4650-90e0-ddda6711ef9b" },
-    });
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      res.status(401).json({ error: "No token provided" });
+      return;
+    }
 
-    if (!teacher || !teacher.groupId) {
+    const token = authHeader.split(" ")[1];
+    const decoded = jwt.verify(token, JWT_SECRET!) as JwtPayload;
+
+    if (
+      decoded.role !== "teacher" ||
+      !decoded.teacherId ||
+      !decoded.groupId ||
+      !decoded.gradeId
+    ) {
       res
-        .status(400)
-        .json({ error: "Teacher not found or not assigned to any grade" });
+        .status(403)
+        .json({ error: "Unauthorized: Invalid teacher credentials" });
       return;
     }
 
-    const existingStudent = await prisma.student.findUnique({
-      where: { email },
-    });
-
-    if (existingStudent) {
-      res.status(409).json({ error: "Student with this email already exists" });
-      return;
+    if (email) {
+      const existingStudent = await prisma.student.findUnique({
+        where: { email },
+      });
+      if (existingStudent) {
+        res
+          .status(409)
+          .json({ error: "Student with this email already exists" });
+        return;
+      }
     }
 
-    const student = await prisma.student.upsert({
-      where: { email },
-      update: {
-        firstName,
-        lastName,
-        phoneNumber,
-        emergencyNumber,
-        teacherId: teacher.id,
-        groupId: teacher.groupId,
-      },
-      create: {
+    const student = await prisma.student.create({
+      data: {
         firstName,
         lastName,
         email,
         phoneNumber,
         emergencyNumber,
-        teacherId: teacher.id,
-        groupId: teacher.groupId,
+        teacherId: decoded.teacherId,
+        groupId: decoded.groupId,
+        gradeId: decoded.gradeId,
       },
     });
+
+    if (email) {
+      await prisma.user.create({
+        data: {
+          email,
+          password: "student1234",
+          role: "student",
+        },
+      });
+    }
 
     res.status(201).json({ message: "✅ Student created", student });
   } catch (error) {
@@ -59,15 +75,14 @@ export const addStudent = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Failed to add student" });
   }
 };
-
 export const getTeacherWithStudents = async (req: Request, res: Response) => {
   const { teacherId } = req.params;
-
+  console.log(teacherId);
   try {
     const teacher = await prisma.teacher.findUnique({
       where: { id: teacherId },
     });
-
+    console.log(teacher);
     if (!teacher || !teacher.groupId) {
       res
         .status(404)

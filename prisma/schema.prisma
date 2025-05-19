@@ -1,7 +1,3 @@
-// 🧩 Энэ файл нь Prisma-ийн schema — өгөгдлийн сангийн хүснэгт, талбар, холбоо зэргийг энд тодорхойлдог
-// 🛠 Schema-г өөрчилсний дараа `npx prisma migrate dev` эсвэл `npx prisma db push` командыг ашиглана !!!
-// 🚀 Дараа нь backend API эсвэл service(src/controllers , src/routes ...) файлуудаа бичиж өгөгдөлтэй ажиллана 
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -27,28 +23,25 @@ model User {
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   teacher   Teacher? @relation("TeacherUser", fields: [teacherId], references: [id])
   teacherId String?  @unique
-
   student   Student? @relation("StudentUser", fields: [studentId], references: [id])
   studentId String?  @unique
-
-  parent   Parent? @relation("ParentUser", fields: [parentId], references: [id])
-  parentId String? @unique
-
-  school   School? @relation("SchoolUser", fields: [schoolId], references: [id])
-  schoolId String? @unique
+  parent    Parent?  @relation("ParentUser", fields: [parentId], references: [id])
+  parentId  String?  @unique
+  school    School?  @relation("SchoolUser", fields: [schoolId], references: [id])
+  schoolId  String?  @unique
 }
 
 model School {
   id        String   @id @default(uuid())
   name      String
   email     String   @unique
-  grades    Grade[]
   createdAt DateTime @default(now())
 
   user User? @relation("SchoolUser")
+
+  Grade Grade[]
 }
 
 model Grade {
@@ -58,6 +51,7 @@ model Grade {
   schoolId String?
   school   School?   @relation(fields: [schoolId], references: [id])
   teachers Teacher[]
+  Student  Student[]
 }
 
 model Group {
@@ -78,31 +72,29 @@ model Teacher {
   subject         String[]
   phoneNumber     String?
   emergencyNumber String?
-
-  groupId String?
-  gradeId String?
-
-  groupRef Group? @relation(fields: [groupId], references: [id])
-  gradeRef Grade? @relation(fields: [gradeId], references: [id])
-
-  user User? @relation("TeacherUser")
+  groupId         String?
+  gradeId         String?
+  groupRef        Group?   @relation(fields: [groupId], references: [id])
+  gradeRef        Grade?   @relation(fields: [gradeId], references: [id])
+  user            User?    @relation("TeacherUser")
 }
 
 model Student {
-  id              String  @id @default(uuid())
+  id              String       @id @default(uuid())
   firstName       String
   lastName        String
-  email           String? @unique
+  email           String?      @unique
   phoneNumber     String?
   emergencyNumber String?
   teacherId       String?
   groupId         String
   parentId        String?
-
-  group      Group?       @relation(fields: [groupId], references: [id])
-  parent     Parent?      @relation(fields: [parentId], references: [id])
-  attendance Attendance[]
-  scores     Score[]
+  grade           Grade        @relation(fields: [gradeId], references: [id])
+  gradeId         String
+  group           Group?       @relation(fields: [groupId], references: [id])
+  parent          Parent?      @relation(fields: [parentId], references: [id])
+  attendance      Attendance[]
+  scores          Score[]
 
   user User? @relation("StudentUser")
 }
