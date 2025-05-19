@@ -1,5 +1,5 @@
 //login (check user role)
-import { Router, Request, Response } from "express";
+import { Router } from "express";
 import { checkUser, createUser, getAllUsers } from "../controllers/userController";
 
 

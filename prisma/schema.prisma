@@ -14,6 +14,8 @@ enum UserRole {
   admin
 }
 
+//Grade = Анги , Group = Бүлэг
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -21,6 +23,14 @@ model User {
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  teacher   Teacher? @relation("TeacherUser", fields: [teacherId], references: [id])
+  teacherId String?  @unique
+  student   Student? @relation("StudentUser", fields: [studentId], references: [id])
+  studentId String?  @unique
+  parent    Parent?  @relation("ParentUser", fields: [parentId], references: [id])
+  parentId  String?  @unique
+  school    School?  @relation("SchoolUser", fields: [schoolId], references: [id])
+  schoolId  String?  @unique
 }
 
 model School {
@@ -28,15 +38,18 @@ model School {
   name      String
   email     String   @unique
   createdAt DateTime @default(now())
-  grades    Grade[]
+
+  user User? @relation("SchoolUser")
+
+  Grade Grade[]
 }
 
 model Grade {
   id       String    @id @default(uuid())
-  number   Int
-  schoolId String
-  school   School    @relation(fields: [schoolId], references: [id])
+  number   Int?      @unique
   groups   Group[]
+  schoolId String?
+  school   School?   @relation(fields: [schoolId], references: [id])
   teachers Teacher[]
 }
 
@@ -50,35 +63,38 @@ model Group {
 }
 
 model Teacher {
-  id              String    @id @default(uuid())
+  id              String   @id @default(uuid())
   firstName       String
   lastName        String
-  email           String    @unique
-  password        String    @default("teacher1234")
+  email           String   @unique
+  password        String?  @default("teacher1234")
+  subject         String[]
+  phoneNumber     String?
+  emergencyNumber String?
   groupId         String?
   gradeId         String?
-  emergencyNumber String?
-  phoneNumber     String?
-  grade           Grade?    @relation(fields: [gradeId], references: [id])
-  group           Group?    @relation(fields: [groupId], references: [id])
-  students        Student[]
+  groupRef        Group?   @relation(fields: [groupId], references: [id])
+  gradeRef        Grade?   @relation(fields: [gradeId], references: [id])
+  user            User?    @relation("TeacherUser")
 }
 
 model Student {
-  id              String       @id @default(uuid())
+  id              String  @id @default(uuid())
   firstName       String
   lastName        String
-  email           String?      @unique
+  email           String? @unique
   phoneNumber     String?
   emergencyNumber String?
   teacherId       String?
   groupId         String
   parentId        String?
-  attendance      Attendance[]
-  scores          Score[]
-  group           Group        @relation(fields: [groupId], references: [id])
-  teacher         Teacher?     @relation(fields: [teacherId], references: [id])
-  parent          Parent?      @relation(fields: [parentId], references: [id])
+
+  group      Group?       @relation(fields: [groupId], references: [id])
+  parent     Parent?      @relation(fields: [parentId], references: [id])
+  attendance Attendance[]
+  scores     Score[]
+
+  user User? @relation("StudentUser")
 }
 
 model Parent {
@@ -88,6 +104,8 @@ model Parent {
   email     String    @unique
   password  String
   students  Student[]
+
+  user User? @relation("ParentUser")
 }
 
 model Attendance {

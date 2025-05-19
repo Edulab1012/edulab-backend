@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const teacherController_1 = require("../controllers/teacherController");
+const groupController_1 = require("../controllers/groupController");
 const router = (0, express_1.Router)();
-router.post("/", teacherController_1.addTeacher);
+router.post("/group", groupController_1.createGroup); // ✅
 exports.default = router;
-//# sourceMappingURL=teacher.js.map
+//# sourceMappingURL=group.js.map

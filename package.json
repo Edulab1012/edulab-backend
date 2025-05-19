@@ -1,33 +1,37 @@
 {
   "name": "edulab-backend",
   "version": "1.0.0",
-  "description": "��#\u0000 \u0000e\u0000d\u0000u\u0000l\u0000a\u0000b\u0000-\u0000b\u0000a\u0000c\u0000k\u0000e\u0000n\u0000d\u0000\r\u0000 \u0000",
-  "main": "index.js",
+  "description": "EduLab backend server",
+  "main": "dist/index.js",
   "scripts": {
+    "prisma": "prisma",
     "dev": "nodemon src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npx prisma generate && npx prisma migrate deploy && tsc",
+    "start": "node dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Edulab1012/edulab-backend.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Edulab1012/edulab-backend/issues"
+  },
+  "homepage": "https://github.com/Edulab1012/edulab-backend#readme",
   "dependencies": {
-    "@prisma/client": "^6.8.1",
-    "@types/bcrypt": "^5.0.2",
-    "@types/cors": "^2.8.18",
-    "@types/express": "^5.0.1",
-    "@types/jsonwebtoken": "^9.0.9",
-    "axios": "^1.9.0",
-    "bcrypt": "^6.0.0",
+    "@prisma/client": "^6.8.2",
     "cors": "^2.8.5",
-    "D": "^1.0.0",
-    "dotenv": "^16.5.0",
-    "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "nodemon": "^3.1.10",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
+    "express": "^5.1.0"
   },
   "devDependencies": {
-    "prisma": "^6.8.1"
+    "@types/cors": "^2.8.18",
+    "@types/express": "^5.0.2",
+    "@types/node": "^22.15.19",
+    "nodemon": "^3.1.10",
+    "prisma": "^6.8.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.8.3"
   }
 }

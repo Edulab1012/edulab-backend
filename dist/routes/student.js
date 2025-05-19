@@ -10,3 +10,4 @@ router
     .post("/add-student", studentController_1.addStudent)
     .get("/:teacherId/students", studentController_1.getTeacherWithStudents);
 exports.default = router;
+//# sourceMappingURL=student.js.map

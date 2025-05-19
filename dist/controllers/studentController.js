@@ -1,69 +1,80 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getstudentWithStudents = exports.addStudent = void 0;
+exports.getTeacherWithStudents = exports.addStudent = void 0;
 const client_1 = __importDefault(require("../prisma/client"));
-const addStudent = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // shin suragch shineer nemehed ID gaar haih bolomjgui shuude. nemsnii daraa automataar uusne.
-    // const student = req.body.student;
-    const { firstName, lastName, email, phoneNumber, emergencyNumber } = req.body;
-    // try {
-    //   const student = await prisma.student.findUnique({
-    //     where: { id: studentId },
-    //   });
-    //   if (!student) {
-    //     res.status(404).json({ error: "student not found" });
-    //     return;
-    //   }
-    const student = yield client_1.default.student.create({
-        data: {
-            firstName,
-            lastName,
-            email,
-            phoneNumber,
-            emergencyNumber,
-            // studentId: student.id,
-            // groupId: student.groupId,
-        },
-    });
-    res.status(201).json(student);
-});
-exports.addStudent = addStudent;
-try { }
-catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to add student" });
-}
-;
-const getstudentWithStudents = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { studentId } = req.params;
+const addStudent = async (req, res) => {
+    const { teacherId, firstName, lastName, email, phoneNumber, emergencyNumber, } = req.body;
     try {
-        const student = yield client_1.default.student.findUnique({
-            where: { id: studentId },
-            include: {
-                students: true,
-            },
+        const teacher = await client_1.default.teacher.findUnique({
+            where: { id: "52aca953-dd89-4650-90e0-ddda6711ef9b" },
         });
-        if (!student) {
-            res.status(404).json({ error: "student not found" });
+        if (!teacher || !teacher.groupId) {
+            res
+                .status(400)
+                .json({ error: "Teacher not found or not assigned to any grade" });
             return;
         }
-        res.status(200).json(student);
+        const existingStudent = await client_1.default.student.findUnique({
+            where: { email },
+        });
+        if (existingStudent) {
+            res.status(409).json({ error: "Student with this email already exists" });
+            return;
+        }
+        const student = await client_1.default.student.upsert({
+            where: { email },
+            update: {
+                firstName,
+                lastName,
+                phoneNumber,
+                emergencyNumber,
+                teacherId: teacher.id,
+                groupId: teacher.groupId,
+            },
+            create: {
+                firstName,
+                lastName,
+                email,
+                phoneNumber,
+                emergencyNumber,
+                teacherId: teacher.id,
+                groupId: teacher.groupId,
+            },
+        });
+        res.status(201).json({ message: "✅ Student created", student });
     }
     catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Failed to fetch student and students" });
+        console.error("❌ Failed to add student:", error);
+        res.status(500).json({ error: "Failed to add student" });
     }
-});
-exports.getstudentWithStudents = getstudentWithStudents;
+};
+exports.addStudent = addStudent;
+const getTeacherWithStudents = async (req, res) => {
+    const { teacherId } = req.params;
+    try {
+        const teacher = await client_1.default.teacher.findUnique({
+            where: { id: teacherId },
+        });
+        if (!teacher || !teacher.groupId) {
+            res
+                .status(404)
+                .json({ error: "Teacher not found or not assigned to group" });
+            return;
+        }
+        const students = await client_1.default.student.findMany({
+            where: {
+                groupId: teacher.groupId,
+            },
+        });
+        res.status(200).json({ teacher, students });
+    }
+    catch (error) {
+        console.error("❌ Failed to fetch teacher and students:", error);
+        res.status(500).json({ error: "Failed to fetch teacher's students" });
+    }
+};
+exports.getTeacherWithStudents = getTeacherWithStudents;
+//# sourceMappingURL=studentController.js.map
