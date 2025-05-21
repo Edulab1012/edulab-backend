@@ -5,8 +5,8 @@ import { addTeachingClass, deleteTeachingClass, getClassesByTeacher } from "../c
 const router = express.Router();
 
 router.post("/", addTeachingClass);
-router.get("/:teacherId", getClassesByTeacher);
-router.delete("/:id", deleteTeachingClass);
+router.get("/", getClassesByTeacher);
+router.delete("/", deleteTeachingClass);
 
 export default router;
 
