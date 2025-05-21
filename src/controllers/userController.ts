@@ -15,7 +15,7 @@ export const checkUser = async (req: Request, res: Response) => {
       res.status(401).json({ error: "❌ Invalid credentials" });
       return
     }
-    
+
     const payload = {
       userId: user.id,
       role: user.role,
@@ -35,7 +35,7 @@ export const checkUser = async (req: Request, res: Response) => {
     }
 
     const token = jwt.sign(payload, process.env.JWT_SECRET as string, {
-      expiresIn: "2h",
+      expiresIn: "20h",
     });
 
     res.status(200).json({

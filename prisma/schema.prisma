@@ -85,8 +85,9 @@ model Teacher {
   groupRef        Group?   @relation(fields: [groupId], references: [id]) // 🧩 багш бүлэгт хамааралтай
   gradeRef        Grade?   @relation(fields: [gradeId], references: [id]) // 🧩 багш ангид хамааралтай
 
-  user    User?     @relation("TeacherUser")
-  Student Student[]
+  user            User?           @relation("TeacherUser")
+  Student         Student[]
+  teachingClasses TeachingClass[] // 🧩 багшийн зааж буй хичээлийн жагсаалт
 }
 
 enum Gender {
@@ -105,7 +106,7 @@ model Student {
   groupId         String?
   gradeId         String? // ✅ Нэмэгдсэн талбар — ангиа хадгалах
   parentId        String?
-  gender          Gender       @default(male)
+  gender          Gender?      @default(male)
   user            User?        @relation("StudentUser")
   teacher         Teacher?     @relation(fields: [teacherId], references: [id]) // 🧩 багштай холбоотой
   group           Group?       @relation(fields: [groupId], references: [id]) // 🧩 бүлэгтэй холбоотой
@@ -143,4 +144,16 @@ model Score {
   midterm    Float
   studentId  String
   student    Student @relation(fields: [studentId], references: [id]) // 🧩 онооны бүртгэл сурагчид хамаарна
+}
+
+model TeachingClass {
+  id        String   @id @default(uuid())
+  subject   String[] // ✅ if multiple subjects
+  grade     String // still holds gradeId
+  group     String? // ✅ add this
+  schedule  Json
+  term      String?
+  teacherId String
+  teacher   Teacher  @relation(fields: [teacherId], references: [id])
+  createdAt DateTime @default(now())
 }
