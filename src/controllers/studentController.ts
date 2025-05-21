@@ -99,8 +99,10 @@ export const addStudent = async (
     return;
   } catch (error: any) {
     console.log("❌ Error adding student:", error);
-    if (error.name === "JsonWebTokenError") {
-      res.status(401).json({ error: "Invalid token. Please login again." });
+    if (error.name === "TokenExpiredError") {
+      res.status(401).json({ error: "⏰ Token has expired. Please login again." });
+    } else if (error.name === "JsonWebTokenError") {
+      res.status(401).json({ error: "❗ Invalid token. Please login again." });
     } else {
       res.status(500).json({ error: "Failed to add student" });
     }

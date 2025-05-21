@@ -33,7 +33,7 @@ const checkUser = async (req, res) => {
             return;
         }
         const token = jsonwebtoken_1.default.sign(payload, process.env.JWT_SECRET, {
-            expiresIn: "2h",
+            expiresIn: "10h",
         });
         res.status(200).json({
             message: user.role,
