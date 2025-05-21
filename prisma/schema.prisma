@@ -57,8 +57,9 @@ model Grade {
   schoolId String?
   school   School? @relation(fields: [schoolId], references: [id])
 
-  teachers Teacher[]
-  students Student[] // 🧩 ангийн бүх сурагчидтай холбоо
+  teachers        Teacher[]
+  students        Student[] // 🧩 ангийн бүх сурагчидтай холбоо
+  teachingClasses TeachingClass[] // 🧩 ангийн заагдаж буй хичээлүүдийн жагсаалт
 }
 
 model Group {
@@ -67,8 +68,9 @@ model Group {
   gradeId String
   grade   Grade  @relation(fields: [gradeId], references: [id]) // 🧩 бүлэг нь нэг ангид хамаарна
 
-  students Student[]
-  teachers Teacher[]
+  students        Student[]
+  teachers        Teacher[]
+  teachingClasses TeachingClass[] // 🧩 бүлгийн заагдаж буй хичээлүүдийн жагсаалт
 }
 
 model Teacher {
@@ -148,12 +150,16 @@ model Score {
 
 model TeachingClass {
   id        String   @id @default(uuid())
-  subject   String[] // ✅ if multiple subjects
-  grade     String // still holds gradeId
-  group     String? // ✅ add this
-  schedule  Json
+  subject   String[]
+  schedule  Json?
   term      String?
-  teacherId String
-  teacher   Teacher  @relation(fields: [teacherId], references: [id])
   createdAt DateTime @default(now())
+
+  teacherId String
+  gradeId   String
+  groupId   String
+
+  teacher Teacher @relation(fields: [teacherId], references: [id])
+  grade   Grade   @relation(fields: [gradeId], references: [id])
+  group   Group   @relation(fields: [groupId], references: [id])
 }
