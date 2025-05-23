@@ -1,7 +1,3 @@
-// 🧩 Энэ файл нь Prisma-ийн schema — өгөгдлийн сангийн хүснэгт, талбар, холбоо зэргийг энд тодорхойлдог
-// 🛠 Schema-г өөрчилсний дараа `npx prisma migrate dev` эсвэл `npx prisma db push` командыг ашиглана !!!
-// 🚀 Дараа нь backend API эсвэл service(src/controllers , src/routes ...) файлуудаа бичиж өгөгдөлтэй ажиллана 
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,13 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRole {
-  teacher
-  student
-  parent
-  admin
-}
-
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -25,76 +14,62 @@ model User {
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  // 🧩 Хэрэглэгч нь зөвхөн нэг төрлийн role-той байна
-  teacher   Teacher? @relation("TeacherUser", fields: [teacherId], references: [id])
   teacherId String?  @unique
-
-  student   Student? @relation("StudentUser", fields: [studentId], references: [id])
   studentId String?  @unique
-
-  parent   Parent? @relation("ParentUser", fields: [parentId], references: [id])
-  parentId String? @unique
-
-  school   School? @relation("SchoolUser", fields: [schoolId], references: [id])
-  schoolId String? @unique
+  parentId  String?  @unique
+  schoolId  String?  @unique
+  parent    Parent?  @relation("ParentUser", fields: [parentId], references: [id])
+  school    School?  @relation("SchoolUser", fields: [schoolId], references: [id])
+  student   Student? @relation("StudentUser", fields: [studentId], references: [id])
+  teacher   Teacher? @relation("TeacherUser", fields: [teacherId], references: [id])
 }
 
 model School {
   id        String   @id @default(uuid())
   name      String
   email     String   @unique
-  grades    Grade[]
   createdAt DateTime @default(now())
-
-  user User? @relation("SchoolUser")
+  grades    Grade[]
+  user      User?    @relation("SchoolUser")
 }
 
 model Grade {
-  id       String  @id @default(uuid())
-  number   Int     @unique
-  groups   Group[]
-  schoolId String?
-  school   School? @relation(fields: [schoolId], references: [id])
-
+  id              String          @id @default(uuid())
+  number          Int             @unique
+  schoolId        String?
+  school          School?         @relation(fields: [schoolId], references: [id])
+  groups          Group[]
+  students        Student[]
   teachers        Teacher[]
-  students        Student[] // 🧩 ангийн бүх сурагчидтай холбоо
-  teachingClasses TeachingClass[] // 🧩 ангийн заагдаж буй хичээлүүдийн жагсаалт
+  teachingClasses TeachingClass[]
 }
 
 model Group {
-  id      String @id @default(uuid())
-  name    String
-  gradeId String
-  grade   Grade  @relation(fields: [gradeId], references: [id]) // 🧩 бүлэг нь нэг ангид хамаарна
-
+  id              String          @id @default(uuid())
+  name            String
+  gradeId         String
+  grade           Grade           @relation(fields: [gradeId], references: [id])
   students        Student[]
   teachers        Teacher[]
-  teachingClasses TeachingClass[] // 🧩 бүлгийн заагдаж буй хичээлүүдийн жагсаалт
+  teachingClasses TeachingClass[]
 }
 
 model Teacher {
-  id              String   @id @default(uuid())
+  id              String          @id @default(uuid())
   firstName       String
   lastName        String
-  email           String   @unique
-  password        String?  @default("teacher1234")
-  subject         String[]
-  phoneNumber     String?
-  emergencyNumber String?
+  email           String          @unique
+  password        String?         @default("teacher1234")
   groupId         String?
+  emergencyNumber String?
   gradeId         String?
-  groupRef        Group?   @relation(fields: [groupId], references: [id]) // 🧩 багш бүлэгт хамааралтай
-  gradeRef        Grade?   @relation(fields: [gradeId], references: [id]) // 🧩 багш ангид хамааралтай
-
-  user            User?           @relation("TeacherUser")
+  phoneNumber     String?
+  subject         String[]
   Student         Student[]
-  teachingClasses TeachingClass[] // 🧩 багшийн зааж буй хичээлийн жагсаалт
-}
-
-enum Gender {
-  male
-  female
+  gradeRef        Grade?          @relation(fields: [gradeId], references: [id])
+  groupRef        Group?          @relation(fields: [groupId], references: [id])
+  teachingClasses TeachingClass[]
+  user            User?           @relation("TeacherUser")
 }
 
 model Student {
@@ -106,28 +81,26 @@ model Student {
   emergencyNumber String?
   teacherId       String?
   groupId         String?
-  gradeId         String? // ✅ Нэмэгдсэн талбар — ангиа хадгалах
   parentId        String?
+  gradeId         String?
   gender          Gender?      @default(male)
-  user            User?        @relation("StudentUser")
-  teacher         Teacher?     @relation(fields: [teacherId], references: [id]) // 🧩 багштай холбоотой
-  group           Group?       @relation(fields: [groupId], references: [id]) // 🧩 бүлэгтэй холбоотой
-  grade           Grade?       @relation(fields: [gradeId], references: [id]) // 🧩 анги мэдээлэл авахад хэрэгтэй
-  parent          Parent?      @relation(fields: [parentId], references: [id]) // 🧩 эцэг эхтэй холбоотой
   attendance      Attendance[]
   scores          Score[]
+  grade           Grade?       @relation(fields: [gradeId], references: [id])
+  group           Group?       @relation(fields: [groupId], references: [id])
+  parent          Parent?      @relation(fields: [parentId], references: [id])
+  teacher         Teacher?     @relation(fields: [teacherId], references: [id])
+  user            User?        @relation("StudentUser")
 }
 
 model Parent {
-  id        String @id @default(uuid())
+  id        String    @id @default(uuid())
   firstName String
   lastName  String
-  email     String @unique
+  email     String    @unique
   password  String
-
-  students Student[] // 🧩 олон хүүхэдтэй холбоотой байж болно
-
-  user User? @relation("ParentUser")
+  students  Student[]
+  user      User?     @relation("ParentUser")
 }
 
 model Attendance {
@@ -135,31 +108,41 @@ model Attendance {
   date      DateTime
   present   Boolean
   studentId String
-  student   Student  @relation(fields: [studentId], references: [id]) // 🧩 ирц бүртгэл сурагчид хамаарна
+  student   Student  @relation(fields: [studentId], references: [id])
 }
 
 model Score {
   id         String  @id @default(uuid())
-  exam       Float
-  active     Float
   attendance Float
   midterm    Float
   studentId  String
-  student    Student @relation(fields: [studentId], references: [id]) // 🧩 онооны бүртгэл сурагчид хамаарна
+  active     Float
+  exam       Float
+  student    Student @relation(fields: [studentId], references: [id])
 }
 
 model TeachingClass {
   id        String   @id @default(uuid())
-  subject   String[]
   schedule  Json?
   term      String?
-  createdAt DateTime @default(now())
-
   teacherId String
+  createdAt DateTime @default(now())
+  subject   String[]
   gradeId   String
   groupId   String
+  grade     Grade    @relation(fields: [gradeId], references: [id])
+  group     Group    @relation(fields: [groupId], references: [id])
+  teacher   Teacher  @relation(fields: [teacherId], references: [id])
+}
 
-  teacher Teacher @relation(fields: [teacherId], references: [id])
-  grade   Grade   @relation(fields: [gradeId], references: [id])
-  group   Group   @relation(fields: [groupId], references: [id])
+enum UserRole {
+  teacher
+  student
+  parent
+  admin
+}
+
+enum Gender {
+  male
+  female
 }

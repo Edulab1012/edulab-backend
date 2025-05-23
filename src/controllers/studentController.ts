@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import prisma from "../prisma/client";
 import jwt from "jsonwebtoken";
-
+import dotenv from "dotenv";
+dotenv.config();
 export const addStudent = async (
   req: Request,
   res: Response
@@ -15,7 +16,9 @@ export const addStudent = async (
       });
       return;
     }
-
+    if (!process.env.JWT_SECRET) {
+      throw new Error("JWT_SECRET is not defined in environment variables");
+    }
     const token = authHeader.split(" ")[1];
 
     const decodedToken = jwt.verify(
@@ -100,7 +103,9 @@ export const addStudent = async (
   } catch (error: any) {
     console.log("❌ Error adding student:", error);
     if (error.name === "TokenExpiredError") {
-      res.status(401).json({ error: "⏰ Token has expired. Please login again." });
+      res
+        .status(401)
+        .json({ error: "⏰ Token has expired. Please login again." });
     } else if (error.name === "JsonWebTokenError") {
       res.status(401).json({ error: "❗ Invalid token. Please login again." });
     } else {
@@ -109,6 +114,68 @@ export const addStudent = async (
   }
 };
 
+export const getStudentsByTeacher = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const authHeader = req.headers.authorization;
+    console.log(authHeader, "auth header section");
+    if (!authHeader || !authHeader.startsWith("Bearer")) {
+      res.status(401).json({
+        error:
+          "❗ Token is missing. Please login and include the Authorization header",
+      });
+      return;
+    }
+
+    const token = authHeader.split(" ")[1];
+    const decodedToken = jwt.verify(
+      token,
+      process.env.JWT_SECRET as string
+    ) as {
+      userId: string;
+      role: string;
+      id: string;
+    };
+    console.log(decodedToken.id, "TEACHER'S ID IS HERE!!!");
+    const user = await prisma.user.findUnique({
+      where: { id: decodedToken.userId },
+    });
+
+    if (!user || user.role !== "teacher") {
+      res.status(403).json({
+        error: "⛔ You are not authorized to view these students",
+      });
+      return;
+    }
+
+    // Find the teacher's students
+    const students = await prisma.student.findMany({
+      where: {
+        teacherId: decodedToken.id, // Using the teacher's ID from token
+      },
+      include: {
+        group: true,
+        grade: true,
+        teacher: true,
+      },
+    });
+
+    res.status(200).json(students);
+  } catch (error: any) {
+    console.log("❌ Error fetching students:", error);
+    if (error.name === "TokenExpiredError") {
+      res
+        .status(401)
+        .json({ error: "⏰ Token has expired. Please login again." });
+    } else if (error.name === "JsonWebTokenError") {
+      res.status(401).json({ error: "❗ Invalid token. Please login again." });
+    } else {
+      res.status(500).json({ error: "Failed to fetch students" });
+    }
+  }
+};
 // 📌Get All Student
 export const getAllStudents = async (
   req: Request,
