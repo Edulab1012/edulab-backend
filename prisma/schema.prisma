@@ -46,17 +46,15 @@ model School {
   email     String   @unique
   grades    Grade[]
   createdAt DateTime @default(now())
-
-  user User? @relation("SchoolUser")
+  user      User?    @relation("SchoolUser")
 }
 
 model Grade {
-  id       String  @id @default(uuid())
-  number   Int     @unique
-  groups   Group[]
-  schoolId String?
-  school   School? @relation(fields: [schoolId], references: [id])
-
+  id              String          @id @default(uuid())
+  number          Int             @unique
+  groups          Group[]
+  schoolId        String?
+  school          School?         @relation(fields: [schoolId], references: [id])
   teachers        Teacher[]
   students        Student[] // 🧩 ангийн бүх сурагчидтай холбоо
   teachingClasses TeachingClass[] // 🧩 ангийн заагдаж буй хичээлүүдийн жагсаалт
@@ -90,6 +88,7 @@ model Teacher {
   user            User?           @relation("TeacherUser")
   Student         Student[]
   teachingClasses TeachingClass[] // 🧩 багшийн зааж буй хичээлийн жагсаалт
+  Lesson          Lesson[]
 }
 
 enum Gender {
@@ -116,6 +115,8 @@ model Student {
   parent          Parent?      @relation(fields: [parentId], references: [id]) // 🧩 эцэг эхтэй холбоотой
   attendance      Attendance[]
   scores          Score[]
+  Lesson          Lesson?      @relation(fields: [lessonId], references: [id])
+  lessonId        String?
 }
 
 model Parent {
@@ -140,12 +141,38 @@ model Attendance {
 
 model Score {
   id         String  @id @default(uuid())
-  exam       Float
-  active     Float
-  attendance Float
-  midterm    Float
   studentId  String
   student    Student @relation(fields: [studentId], references: [id]) // 🧩 онооны бүртгэл сурагчид хамаарна
+  lessonId   String
+  lesson     Lesson  @relation(fields: [lessonId], references: [id]) // 🧩 онооны бүртгэл хичээлтэй холбоотой
+  seasonId   String?
+  season     Season? @relation(fields: [seasonId], references: [id]) // 🧩 онооны бүртгэл улиралтай холбоотой
+  attendance Float?
+  activity   Float?
+  midterm    Float?
+  final      Float?
+  totalScore Float?
+}
+
+model Lesson {
+  id        String    @id @default(uuid())
+  name      String
+  teacherId String
+  teacher   Teacher   @relation(fields: [teacherId], references: [id]) // 🧩 хичээл багштай холбоотой
+  students  Student[] // 🧩 хичээлд сурагчид хамаарна
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  scores    Score[] // 🧩 хичээлд оноо бүртгэлтэй холбоотой
+}
+
+model Season {
+  id        String   @id @default(uuid())
+  name      String
+  startDate DateTime
+  endDate   DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  scores    Score[] // 🧩 улиралд оноо бүртгэлтэй холбоотой
 }
 
 model TeachingClass {
