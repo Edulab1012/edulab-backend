@@ -120,6 +120,7 @@ export const getStudentsByTeacher = async (
 ): Promise<void> => {
   try {
     const authHeader = req.headers.authorization;
+    console.log(authHeader, "auth header section");
     if (!authHeader || !authHeader.startsWith("Bearer")) {
       res.status(401).json({
         error:
@@ -135,10 +136,9 @@ export const getStudentsByTeacher = async (
     ) as {
       userId: string;
       role: string;
-      id: string; // This should be the teacher's ID
+      id: string;
     };
-
-    // Verify the user is a teacher
+    console.log(decodedToken.id, "TEACHER'S ID IS HERE!!!");
     const user = await prisma.user.findUnique({
       where: { id: decodedToken.userId },
     });
