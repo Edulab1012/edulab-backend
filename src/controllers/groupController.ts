@@ -53,7 +53,7 @@ export const createGroup = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.log("Error creating group:", error);
     res.status(500).json({
-      error: "Серверийн алдаа.",
+      error: "Серверийн алдаа",
       details: error.message,
     });
   }
