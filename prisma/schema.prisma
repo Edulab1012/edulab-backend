@@ -70,6 +70,7 @@ model Teacher {
   groupRef        Group?          @relation(fields: [groupId], references: [id])
   teachingClasses TeachingClass[]
   user            User?           @relation("TeacherUser")
+  Attendance      Attendance[]
 }
 
 model Student {
@@ -104,11 +105,21 @@ model Parent {
 }
 
 model Attendance {
-  id        String   @id @default(uuid())
-  date      DateTime
-  present   Boolean
+  id        String           @id @default(uuid())
+  date      DateTime         @default(now())
+  status    AttendanceStatus
   studentId String
-  student   Student  @relation(fields: [studentId], references: [id])
+  teacherId String
+  student   Student          @relation(fields: [studentId], references: [id])
+  teacher   Teacher          @relation(fields: [teacherId], references: [id])
+
+  @@unique([studentId, teacherId, date])
+}
+
+enum AttendanceStatus {
+  present
+  absent
+  late
 }
 
 model Score {
