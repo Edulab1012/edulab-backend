@@ -34,6 +34,28 @@ app.get("/", (req: Request, res: Response) => {
   }
 });
 
+
+
+
+const addProfile = async(req: Request, res: Response)=>{
+const profile = req.body
+console.log(profile);
+res.send("avchlaa")
+
+}
+
+
+
+
+app.post("/student", addProfile)
+
+
+
+
+
+
+
+
 const PORT = process.env.PORT || 8000;
 
 app.listen(PORT, () => {
