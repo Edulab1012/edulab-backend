@@ -28,6 +28,9 @@ app.get("/", (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 });
+
+
+
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
     console.log(`🚀 Server listening at: http://localhost:${PORT}`);

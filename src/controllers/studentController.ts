@@ -200,3 +200,11 @@ export const getAllStudents = async (
       .json({ error: "Сурагчдын мэдээллийг авахад алдаа гарлаа." });
   }
 };
+
+
+
+export const addProfile = async(req: Request, res: Response)=>{
+  const profile = req.body
+  console.log(profile);
+  res.send("avchlaa")
+  }
