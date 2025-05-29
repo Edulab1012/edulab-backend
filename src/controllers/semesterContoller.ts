@@ -1,12 +1,10 @@
 import { Request, Response } from "express";
 import prisma from "../prisma/client";
 
-// Create a new semester
 export async function createSemester(req: Request, res: Response) {
   const { name, startDate, endDate, isCurrent } = req.body;
 
   try {
-    // Ensure only one semester is marked as current
     if (isCurrent) {
       await prisma.semester.updateMany({
         where: { isCurrent: true },

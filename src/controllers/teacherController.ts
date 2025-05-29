@@ -211,7 +211,6 @@ export async function getTodaysAttendance(req: Request, res: Response) {
       },
     });
 
-    // Convert to a format that's easier to use in the frontend
     const attendanceMap = attendances.reduce((acc, curr) => {
       acc[curr.studentId] = curr.status;
       return acc;
