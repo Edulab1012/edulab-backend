@@ -115,6 +115,7 @@ model Semester {
 }
 
 model Attendance {
+<<<<<<< HEAD
   id         String           @id @default(uuid())
   date       DateTime         @default(now())
   status     AttendanceStatus
@@ -126,6 +127,17 @@ model Attendance {
   semester   Semester         @relation(fields: [semesterId], references: [id])
 
   @@unique([studentId, teacherId, date, semesterId])
+=======
+  id        String           @id @default(uuid())
+  date      DateTime         @default(now())
+  status    AttendanceStatus
+  studentId String
+  teacherId String
+  student   Student          @relation(fields: [studentId], references: [id])
+  teacher   Teacher          @relation(fields: [teacherId], references: [id])
+
+  @@unique([studentId, teacherId, date])
+>>>>>>> 48571a11fc57c426797b7995f174f301677ab173
 }
 
 enum AttendanceStatus {
