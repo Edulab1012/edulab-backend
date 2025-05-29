@@ -70,6 +70,7 @@ model Teacher {
   groupRef        Group?          @relation(fields: [groupId], references: [id])
   teachingClasses TeachingClass[]
   user            User?           @relation("TeacherUser")
+  Attendance      Attendance[]
 }
 
 model Student {
@@ -103,12 +104,34 @@ model Parent {
   user      User?     @relation("ParentUser")
 }
 
+model Semester {
+  id              String          @id @default(uuid())
+  name            String
+  startDate       DateTime
+  endDate         DateTime
+  isCurrent       Boolean         @default(false)
+  attendances     Attendance[]
+  teachingClasses TeachingClass[]
+}
+
 model Attendance {
-  id        String   @id @default(uuid())
-  date      DateTime
-  present   Boolean
-  studentId String
-  student   Student  @relation(fields: [studentId], references: [id])
+  id         String           @id @default(uuid())
+  date       DateTime         @default(now())
+  status     AttendanceStatus
+  studentId  String
+  teacherId  String
+  semesterId String
+  student    Student          @relation(fields: [studentId], references: [id])
+  teacher    Teacher          @relation(fields: [teacherId], references: [id])
+  semester   Semester         @relation(fields: [semesterId], references: [id])
+
+  @@unique([studentId, teacherId, date, semesterId])
+}
+
+enum AttendanceStatus {
+  present
+  absent
+  late
 }
 
 model Score {
@@ -122,17 +145,19 @@ model Score {
 }
 
 model TeachingClass {
-  id        String   @id @default(uuid())
-  schedule  Json?
-  term      String?
-  teacherId String
-  createdAt DateTime @default(now())
-  subject   String[]
-  gradeId   String
-  groupId   String
-  grade     Grade    @relation(fields: [gradeId], references: [id])
-  group     Group    @relation(fields: [groupId], references: [id])
-  teacher   Teacher  @relation(fields: [teacherId], references: [id])
+  id         String    @id @default(uuid())
+  schedule   Json?
+  term       String?
+  teacherId  String
+  createdAt  DateTime  @default(now())
+  subject    String[]
+  gradeId    String
+  groupId    String
+  grade      Grade     @relation(fields: [gradeId], references: [id])
+  group      Group     @relation(fields: [groupId], references: [id])
+  teacher    Teacher   @relation(fields: [teacherId], references: [id])
+  Semester   Semester? @relation(fields: [semesterId], references: [id])
+  semesterId String?
 }
 
 enum UserRole {

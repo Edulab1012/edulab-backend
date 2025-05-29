@@ -7,7 +7,7 @@ import teacherRoutes from "./routes/teacher";
 import groupRoutes from "./routes/group";
 import studentRoutes from "./routes/student";
 import teachingClassRoutes from "./routes/teachingClass";
-
+import semesterRoutes from "./routes/semester";
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -24,6 +24,7 @@ app.use("/api/v1/teacher", teacherRoutes);
 app.use("/api/v1/class", groupRoutes);
 app.use("/api/v1/student", studentRoutes);
 app.use("/api/v1/teachingClass", teachingClassRoutes);
+app.use("/api/v1/semester", semesterRoutes);
 
 app.get("/", (req: Request, res: Response) => {
   try {
