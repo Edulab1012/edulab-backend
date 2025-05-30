@@ -64,8 +64,9 @@ interface JwtPayload {
   [key: string]: any;
 }
 
-export const allGroups = async (req: Request, res: Response) => {
+export const allGroupsByTeacher = async (req: Request, res: Response) => {
   try {
+    // Validate authorization header
     const authHeader = req.headers.authorization;
     if (!authHeader?.startsWith("Bearer ")) {
       res.status(401).json({ error: "Unauthorized - No token provided" });
@@ -74,6 +75,7 @@ export const allGroups = async (req: Request, res: Response) => {
 
     const token = authHeader.split(" ")[1];
 
+    // Verify JWT token
     let decoded: JwtPayload;
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
@@ -82,37 +84,43 @@ export const allGroups = async (req: Request, res: Response) => {
       return;
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: decoded.userId },
-      select: {
-        teacher: {
-          select: { id: true },
-        },
-      },
-    });
-
-    if (!user?.teacher) {
-      res.status(404).json({ error: "Teacher profile not found" });
-      return;
-    }
-
-    const groups = await prisma.group.findMany({
-      where: {
-        teachers: {
-          some: {
-            id: user.teacher.id,
+    try {
+      // Find user with teacher relation
+      const user = await prisma.user.findUnique({
+        where: { id: decoded.userId },
+        select: {
+          teacher: {
+            select: { id: true },
           },
         },
-      },
-      include: {
-        grade: true,
-      },
-    });
+      });
 
-    res.status(200).json(groups);
-    return;
+      if (!user?.teacher) {
+        res.status(404).json({ error: "Teacher profile not found" });
+        return;
+      }
+
+      // Find groups associated with the teacher
+      const groups = await prisma.group.findMany({
+        where: {
+          teachers: {
+            some: {
+              id: user.teacher.id,
+            },
+          },
+        },
+        include: {
+          grade: true,
+        },
+      });
+
+      res.status(200).json(groups);
+      return;
+    } finally {
+      await prisma.$disconnect();
+    }
   } catch (error) {
-    console.error("Error in allGroups:", error);
+    console.error("Error in allGroupsByTeacher:", error);
 
     if (error instanceof jwt.JsonWebTokenError) {
       res.status(401).json({ error: "Invalid token" });
@@ -129,5 +137,23 @@ export const allGroups = async (req: Request, res: Response) => {
       message: error instanceof Error ? error.message : "Unknown error",
     });
     return;
+  }
+};
+
+export const allGroups = async (req: Request, res: Response) => {
+  try {
+    const groups = await prisma.group.findMany({
+      include: {
+        grade: true,
+      },
+    });
+
+    res.status(200).json(groups);
+  } catch (error) {
+    console.error("Error in allGroups:", error);
+    res.status(500).json({
+      error: "Internal server error",
+      message: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 };
