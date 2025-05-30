@@ -1,0 +1,19 @@
+export function generatePromoCode(options?: {
+    length?: number;
+    prefix?: string;
+    charset?: string;
+}): string {
+    const length = options?.length ?? 8;
+    const prefix = options?.prefix ?? '';
+    const charset =
+        options?.charset ?? 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+    let code = '';
+    for (let i = 0; i < length; i++) {
+        code += charset.charAt(Math.floor(Math.random() * charset.length));
+    }
+
+    console.log(`Generated promo code: ${prefix}${code}`);
+    return prefix + code;
+}
+

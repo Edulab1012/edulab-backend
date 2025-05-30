@@ -3,11 +3,10 @@ import cors from "cors";
 import { Request, Response } from "express";
 
 import authRoutes from "./routes/auth";
-import teacherRoutes from "./routes/teacher";
-import groupRoutes from "./routes/group";
-import studentRoutes from "./routes/student";
-import teachingClassRoutes from "./routes/teachingClass";
-import semesterRoutes from "./routes/semester";
+// import teacherRoutes from "./routes/teacher";
+// import studentRoutes from "./routes/student";
+// import classRoutes from "./routes/class";
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -20,11 +19,9 @@ app.use(
 );
 
 app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1/teacher", teacherRoutes);
-app.use("/api/v1/class", groupRoutes);
-app.use("/api/v1/student", studentRoutes);
-app.use("/api/v1/teachingClass", teachingClassRoutes);
-app.use("/api/v1/semester", semesterRoutes);
+// app.use("/api/v1/teacher", teacherRoutes);
+// app.use("/api/v1/student", studentRoutes);
+// app.use("/api/v1/class", classRoutes);
 
 app.get("/", (req: Request, res: Response) => {
   try {

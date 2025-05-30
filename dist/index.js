@@ -7,18 +7,18 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const auth_1 = __importDefault(require("./routes/auth"));
 const teacher_1 = __importDefault(require("./routes/teacher"));
-const group_1 = __importDefault(require("./routes/group"));
 const student_1 = __importDefault(require("./routes/student"));
-const teachingClass_1 = __importDefault(require("./routes/teachingClass"));
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
-// app.use("/api/v1/student", studentRoutes);
+app.use((0, cors_1.default)({
+    origin: "http://localhost:3000",
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
+}));
 app.use("/api/v1/auth", auth_1.default);
 app.use("/api/v1/teacher", teacher_1.default);
-app.use("/api/v1/class", group_1.default);
 app.use("/api/v1/student", student_1.default);
-app.use("/api/teaching-class", teachingClass_1.default);
 app.get("/", (req, res) => {
     try {
         res.send("✅ Server running...");
