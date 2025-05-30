@@ -1,14 +1,13 @@
-import { Request, response, Response } from "express"
+import { Request, response, Response } from "express";
 import jwt from "jsonwebtoken";
 import prisma from "../prisma/client";
 import bcrypt from "bcrypt";
 
 //Create User ➕
 export const createUser = async (req: Request, res: Response) => {
-
   try {
     const { username, email, password, role } = req.body;
-    
+
     const existingUser = await prisma.user.findFirst({
       where: { email },
     });
@@ -16,7 +15,7 @@ export const createUser = async (req: Request, res: Response) => {
       res.status(403).json({ error: "❌ User already exists" });
       return;
     }
-    const hashedPassword = await bcrypt.hash(password, 10); // 10 rounds of salt
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await prisma.user.create({
       data: {
@@ -33,7 +32,6 @@ export const createUser = async (req: Request, res: Response) => {
   }
 };
 
-
 // 📌 CHECK User (LOGIN)
 export const checkUser = async (req: Request, res: Response) => {
   try {
@@ -45,14 +43,14 @@ export const checkUser = async (req: Request, res: Response) => {
 
     if (!user) {
       res.status(401).json({ error: "❌ Invalid credentials" });
-      return
+      return;
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
       res.status(401).json({ error: "❌ Invalid credentials" });
-      return
+      return;
     }
 
     res.status(200).json({
@@ -64,13 +62,12 @@ export const checkUser = async (req: Request, res: Response) => {
   }
 };
 
-
-// 📌 GET ALL Users
-export const getAllUsers = async (req: Request, res: Response) => {
-  try {
-    const users = await prisma.user.findMany();
-    res.status(200).json(users);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to fetch users" });
-  }
-};
+// // 📌 GET ALL Users
+// export const getAllUsers = async (req: Request, res: Response) => {
+//   try {
+//     const users = await prisma.user.findMany();
+//     res.status(200).json(users);
+//   } catch (err) {
+//     res.status(500).json({ error: "Failed to fetch users" });
+//   }
+// };
