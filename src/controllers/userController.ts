@@ -8,6 +8,7 @@ export const createUser = async (req: Request, res: Response) => {
 
   try {
     const { username, email, password, role } = req.body;
+    
     const existingUser = await prisma.user.findFirst({
       where: { email },
     });
