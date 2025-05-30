@@ -4,7 +4,7 @@ exports.generatePromoCode = generatePromoCode;
 function generatePromoCode(options) {
     const length = options?.length ?? 8;
     const prefix = options?.prefix ?? '';
-    const charset = options?.charset ?? 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no O/0, I/1 to avoid confusion
+    const charset = options?.charset ?? 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     let code = '';
     for (let i = 0; i < length; i++) {
         code += charset.charAt(Math.floor(Math.random() * charset.length));

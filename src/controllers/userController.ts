@@ -1,24 +1,28 @@
 import { Request, response, Response } from "express"
-import jwt from "jsonwebtoken";
-import prisma from "../prisma/client";
 import bcrypt from "bcrypt";
+import { PrismaClient } from "@prisma/client";
 
 //Create User ➕
-export const createUser = async (req: Request, res: Response) => {
 
+const prisma = new PrismaClient();
+
+export const createUser = async (req: Request, res: Response) => {
   try {
     const { username, email, password, role } = req.body;
-    
+
     const existingUser = await prisma.user.findFirst({
       where: { email },
     });
+
     if (existingUser) {
-      res.status(403).json({ error: "❌ User already exists" });
+      res.status(403).json({ error: "❌ Хэрэглэгч аль хэдийн бүртгэгдсэн байна." });
       return;
     }
-    const hashedPassword = await bcrypt.hash(password, 10); // 10 rounds of salt
 
-    const user = await prisma.user.create({
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Эхлээд хэрэглэгчийг үүсгэнэ
+    const newUser = await prisma.user.create({
       data: {
         username,
         email,
@@ -27,12 +31,51 @@ export const createUser = async (req: Request, res: Response) => {
       },
     });
 
-    res.status(201).json(user);
+    // Ролиос хамаарч холбоотой model-уудыг үүсгэнэ
+    if (role === "teacher") {
+      const teacher = await prisma.teacher.create({
+        data: {
+          user: { connect: { id: newUser.id } },
+          email: newUser.email,
+          firstName: "",
+          lastName: "",
+          subject: [],
+        },
+      });
+
+      // User-ийг шинэчилж teacherId-г хадгална
+      await prisma.user.update({
+        where: { id: newUser.id },
+        data: { teacherId: teacher.id },
+      });
+    }
+
+    if (role === "student") {
+      const student = await prisma.student.create({
+        data: {
+          user: { connect: { id: newUser.id } },
+          email: newUser.email,
+          firstName: "",
+          lastName: "",
+        },
+      });
+
+      // User-ийг шинэчилж studentId-г хадгална
+      await prisma.user.update({
+        where: { id: newUser.id },
+        data: { studentId: student.id },
+      });
+    }
+
+    // Амжилттай хариу буцаах
+    res.status(201).json(newUser);
+    return;
   } catch (err) {
-    res.status(500).json({ error: "Failed to create user" });
+    console.error("❌ Error creating user:", err);
+    res.status(500).json({ error: "Хэрэглэгч үүсгэхэд алдаа гарлаа." });
+    return;
   }
 };
-
 
 // 📌 CHECK User (LOGIN)
 export const checkUser = async (req: Request, res: Response) => {
@@ -55,9 +98,33 @@ export const checkUser = async (req: Request, res: Response) => {
       return
     }
 
-    res.status(200).json({
-      message: "✅ User authenticated successfully",
-    });
+    if (user.role === "teacher") {
+      res.status(200).json({
+        message: "✅ Teacher authenticated successfully",
+        success: true,
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+        }
+      });
+    }
+    if (user.role === "student") {
+      res.status(200).json({
+        message: "✅ Student authenticated successfully",
+        success: true,
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+        }
+      });
+    }
+
+
+
   } catch (err: any) {
     console.log("❌ Login error:", err);
     res.status(500).json({ message: "❌ Failed to check user", error: err });

@@ -8,6 +8,7 @@ const cors_1 = __importDefault(require("cors"));
 const auth_1 = __importDefault(require("./routes/auth"));
 const teacher_1 = __importDefault(require("./routes/teacher"));
 const student_1 = __importDefault(require("./routes/student"));
+const class_1 = __importDefault(require("./routes/class"));
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
@@ -19,6 +20,7 @@ app.use((0, cors_1.default)({
 app.use("/api/v1/auth", auth_1.default);
 app.use("/api/v1/teacher", teacher_1.default);
 app.use("/api/v1/student", student_1.default);
+app.use("/api/v1/class", class_1.default);
 app.get("/", (req, res) => {
     try {
         res.send("✅ Server running...");

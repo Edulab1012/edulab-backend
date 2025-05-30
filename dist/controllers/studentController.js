@@ -21,13 +21,6 @@ const addStudent = async (req, res) => {
         const token = authHeader.split(" ")[1];
         const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
         const user = await client_1.default.user.findUnique({ where: { id: decoded.userId } });
-        if (!user || (user.role !== "teacher" && user.role !== "admin")) {
-            res.status(403).json({
-                error: "⛔ You are not authorized to add students",
-                message: "⛔ Зөвхөн багш эсвэл админ л сурагч нэмэх боломжтой.",
-            });
-            return;
-        }
         const teacher = await client_1.default.teacher.findUnique({ where: { id: decoded.id } });
         if (!teacher) {
             res.status(400).json({

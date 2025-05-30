@@ -42,15 +42,13 @@ model Teacher {
 }
 
 model Class {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   name      String
-  promoCode String   @unique
-  createdAt DateTime @default(now())
-
-  teacher   Teacher? @relation("TeacherClass", fields: [teacherId], references: [id]) // ✅ Энд тохирсон нэр
+  promoCode String?   @unique
+  createdAt DateTime  @default(now())
+  teacher   Teacher?  @relation("TeacherClass", fields: [teacherId], references: [id])
   teacherId String?
-
-  students Student[]
+  students  Student[]
 }
 
 model Student {

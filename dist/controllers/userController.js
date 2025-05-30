@@ -10,6 +10,13 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const createUser = async (req, res) => {
     try {
         const { username, email, password, role } = req.body;
+        const existingUser = await client_1.default.user.findFirst({
+            where: { email },
+        });
+        if (existingUser) {
+            res.status(403).json({ error: "❌ User already exists" });
+            return;
+        }
         const hashedPassword = await bcrypt_1.default.hash(password, 10); // 10 rounds of salt
         const user = await client_1.default.user.create({
             data: {
@@ -20,6 +27,7 @@ const createUser = async (req, res) => {
             },
         });
         res.status(201).json(user);
+        return;
     }
     catch (err) {
         res.status(500).json({ error: "Failed to create user" });
@@ -42,9 +50,30 @@ const checkUser = async (req, res) => {
             res.status(401).json({ error: "❌ Invalid credentials" });
             return;
         }
-        res.status(200).json({
-            message: "✅ User authenticated successfully",
-        });
+        if (user.role === "teacher") {
+            res.status(200).json({
+                message: "✅ Teacher authenticated successfully",
+                success: true,
+                user: {
+                    id: user.id,
+                    username: user.username,
+                    email: user.email,
+                    role: user.role,
+                }
+            });
+        }
+        if (user.role === "student") {
+            res.status(200).json({
+                message: "✅ Student authenticated successfully",
+                success: true,
+                user: {
+                    id: user.id,
+                    username: user.username,
+                    email: user.email,
+                    role: user.role,
+                }
+            });
+        }
     }
     catch (err) {
         console.log("❌ Login error:", err);

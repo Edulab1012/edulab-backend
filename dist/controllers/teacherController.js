@@ -22,13 +22,6 @@ async function addTeacher(req, res) {
                 email,
                 phoneNumber,
                 subject,
-                user: {
-                    create: {
-                        email,
-                        password: "teacher1234",
-                        role: "teacher",
-                    },
-                },
             },
         });
         res.status(201).json({
