@@ -8,100 +8,69 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  role      UserRole
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  teacherId String?  @unique
-  studentId String?  @unique
-  parentId  String?  @unique
-  schoolId  String?  @unique
-  parent    Parent?  @relation("ParentUser", fields: [parentId], references: [id])
-  school    School?  @relation("SchoolUser", fields: [schoolId], references: [id])
-  student   Student? @relation("StudentUser", fields: [studentId], references: [id])
-  teacher   Teacher? @relation("TeacherUser", fields: [teacherId], references: [id])
-}
+  id          String   @id @default(cuid())
+  username    String   @unique
+  phoneNumber String?  @unique
+  email       String   @unique
+  role        UserRole
+  password    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-model School {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  createdAt DateTime @default(now())
-  grades    Grade[]
-  user      User?    @relation("SchoolUser")
-}
+  teacherId String? @unique
+  studentId String? @unique
 
-model Grade {
-  id              String          @id @default(uuid())
-  number          Int             @unique
-  schoolId        String?
-  school          School?         @relation(fields: [schoolId], references: [id])
-  groups          Group[]
-  students        Student[]
-  teachers        Teacher[]
-  teachingClasses TeachingClass[]
-}
-
-model Group {
-  id              String          @id @default(uuid())
-  name            String
-  gradeId         String
-  grade           Grade           @relation(fields: [gradeId], references: [id])
-  students        Student[]
-  teachers        Teacher[]
-  teachingClasses TeachingClass[]
+  teacher Teacher? @relation("TeacherUser", fields: [teacherId], references: [id])
+  student Student? @relation("StudentUser", fields: [studentId], references: [id])
 }
 
 model Teacher {
-  id              String          @id @default(uuid())
+  id              String   @id @default(uuid())
   firstName       String
   lastName        String
-  email           String          @unique
-  password        String?         @default("teacher1234")
-  groupId         String?
-  emergencyNumber String?
-  gradeId         String?
+  email           String   @unique
   phoneNumber     String?
+  password        String?  @default("teacher1234")
+  emergencyNumber String?
   subject         String[]
-  Student         Student[]
-  gradeRef        Grade?          @relation(fields: [gradeId], references: [id])
-  groupRef        Group?          @relation(fields: [groupId], references: [id])
-  teachingClasses TeachingClass[]
-  user            User?           @relation("TeacherUser")
-  Attendance      Attendance[]
+
+  user       User?        @relation("TeacherUser")
+  Attendance Attendance[]
+
+  classes  Class[]   @relation("TeacherClass") // ✅ Энд тохирсон нэр
+  students Student[]
+}
+
+model Class {
+  id        String   @id @default(uuid())
+  name      String
+  promoCode String   @unique
+  createdAt DateTime @default(now())
+
+  teacher   Teacher? @relation("TeacherClass", fields: [teacherId], references: [id]) // ✅ Энд тохирсон нэр
+  teacherId String?
+
+  students Student[]
 }
 
 model Student {
-  id              String       @id @default(uuid())
+  id              String  @id @default(uuid())
   firstName       String
   lastName        String
-  email           String?      @unique
+  email           String? @unique
   phoneNumber     String?
   emergencyNumber String?
-  teacherId       String?
-  groupId         String?
-  parentId        String?
-  gradeId         String?
-  gender          Gender?      @default(male)
-  attendance      Attendance[]
-  scores          Score[]
-  grade           Grade?       @relation(fields: [gradeId], references: [id])
-  group           Group?       @relation(fields: [groupId], references: [id])
-  parent          Parent?      @relation(fields: [parentId], references: [id])
-  teacher         Teacher?     @relation(fields: [teacherId], references: [id])
-  user            User?        @relation("StudentUser")
-}
+  gender          Gender? @default(male)
 
-model Parent {
-  id        String    @id @default(uuid())
-  firstName String
-  lastName  String
-  email     String    @unique
-  password  String
-  students  Student[]
-  user      User?     @relation("ParentUser")
+  classId String?
+  class   Class?  @relation(fields: [classId], references: [id])
+
+  teacherId String?
+  teacher   Teacher? @relation(fields: [teacherId], references: [id])
+
+  user       User?        @relation("StudentUser")
+  attendance Attendance[]
+  scores     Score[]
 }
 
 model Attendance {
@@ -110,10 +79,21 @@ model Attendance {
   status    AttendanceStatus
   studentId String
   teacherId String
-  student   Student          @relation(fields: [studentId], references: [id])
-  teacher   Teacher          @relation(fields: [teacherId], references: [id])
+
+  student Student @relation(fields: [studentId], references: [id])
+  teacher Teacher @relation(fields: [teacherId], references: [id])
 
   @@unique([studentId, teacherId, date])
+}
+
+model Score {
+  id         String  @id @default(uuid())
+  attendance Float
+  midterm    Float
+  active     Float
+  exam       Float
+  studentId  String
+  student    Student @relation(fields: [studentId], references: [id])
 }
 
 enum AttendanceStatus {
@@ -122,35 +102,9 @@ enum AttendanceStatus {
   late
 }
 
-model Score {
-  id         String  @id @default(uuid())
-  attendance Float
-  midterm    Float
-  studentId  String
-  active     Float
-  exam       Float
-  student    Student @relation(fields: [studentId], references: [id])
-}
-
-model TeachingClass {
-  id        String   @id @default(uuid())
-  schedule  Json?
-  term      String?
-  teacherId String
-  createdAt DateTime @default(now())
-  subject   String[]
-  gradeId   String
-  groupId   String
-  grade     Grade    @relation(fields: [gradeId], references: [id])
-  group     Group    @relation(fields: [groupId], references: [id])
-  teacher   Teacher  @relation(fields: [teacherId], references: [id])
-}
-
 enum UserRole {
   teacher
   student
-  parent
-  admin
 }
 
 enum Gender {

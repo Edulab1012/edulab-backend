@@ -14,8 +14,8 @@ import {
 const router = Router();
 router
   .post("/", addTeacher)
-  .get("/withStudents", getStudentsWithAttendance)
+  // .get("/withStudents", getStudentsWithAttendance)
   .post("/attendance", submitAttendance)
-  .get("/attendance/today", getTodaysAttendance);
+// .get("/attendance/today", getTodaysAttendance);
 
 export default router;
