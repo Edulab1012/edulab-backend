@@ -29,7 +29,7 @@ export const createClass = async (req: Request, res: Response) => {
         const newClass = await prisma.class.create({
             data: {
                 name,
-                teacherId: user.teacher.id, 
+                teacherId: user.teacher.id,
                 promoCode: finalPromoCode,
             },
         });
@@ -48,3 +48,30 @@ export const createClass = async (req: Request, res: Response) => {
         return;
     }
 };
+
+//Check if class exists by promo code
+export const checkClass = async (req: Request, res: Response) => {
+    try {
+        const { promoCode } = req.body;
+
+        if (!promoCode) {
+            res.status(400).json({ message: "код шаардлагатай." });
+            return;
+        }
+
+        const existingClass = await prisma.class.findUnique({
+            where: { promoCode },
+        });
+
+        if (!existingClass) {
+            res.status(404).json({ message: "Анги олдсонгүй." });
+            return;
+        }
+
+        res.status(200).json({ success: true, class: existingClass });
+
+    } catch (error) {
+        console.error("❌ Error while checking class:", error);
+        res.status(500).json({ message: "Анги шалгахад алдаа гарлаа." });
+    }
+}

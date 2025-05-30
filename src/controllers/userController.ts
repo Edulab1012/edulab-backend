@@ -8,68 +8,88 @@ const prisma = new PrismaClient();
 
 export const createUser = async (req: Request, res: Response) => {
   try {
-    const { username, email, password, role } = req.body;
+    const { username, email, password, role, classId } = req.body;
 
     const existingUser = await prisma.user.findFirst({
       where: { email },
     });
 
     if (existingUser) {
-      res.status(403).json({ error: "❌ Хэрэглэгч аль хэдийн бүртгэгдсэн байна." });
+      res.status(403).json({ message: "❌ Хэрэглэгч аль хэдийн бүртгэгдсэн байна." });
       return;
     }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Эхлээд хэрэглэгчийг үүсгэнэ
-    const newUser = await prisma.user.create({
-      data: {
-        username,
-        email,
-        password: hashedPassword,
-        role,
-      },
+    const existingUsername = await prisma.user.findUnique({
+      where: { username },
     });
 
-    // Ролиос хамаарч холбоотой model-уудыг үүсгэнэ
-    if (role === "teacher") {
-      const teacher = await prisma.teacher.create({
-        data: {
-          user: { connect: { id: newUser.id } },
-          email: newUser.email,
-          firstName: "",
-          lastName: "",
-          subject: [],
-        },
-      });
-
-      // User-ийг шинэчилж teacherId-г хадгална
-      await prisma.user.update({
-        where: { id: newUser.id },
-        data: { teacherId: teacher.id },
-      });
+    if (existingUsername) {
+      res.status(409).json({ message: "❗ Энэ хэрэглэгчийн нэр аль хэдийн байна." }); return
     }
-
     if (role === "student") {
-      const student = await prisma.student.create({
+      const existingStudent = await prisma.student.findUnique({
+        where: { email },
+      });
+
+      if (existingStudent) {
+        res.status(409).json({
+          message: "❗ Энэ имэйлээр сурагч бүртгэгдсэн байна.",
+        });
+        return;
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // Эхлээд хэрэглэгчийг үүсгэнэ
+      const newUser = await prisma.user.create({
         data: {
-          user: { connect: { id: newUser.id } },
-          email: newUser.email,
-          firstName: "",
-          lastName: "",
+          username,
+          email,
+          password: hashedPassword,
+          role,
         },
       });
 
-      // User-ийг шинэчилж studentId-г хадгална
-      await prisma.user.update({
-        where: { id: newUser.id },
-        data: { studentId: student.id },
-      });
-    }
+      // Ролиос хамаарч холбоотой model-уудыг үүсгэнэ
+      if (role === "teacher") {
+        const teacher = await prisma.teacher.create({
+          data: {
+            user: { connect: { id: newUser.id } },
+            email: newUser.email,
+            firstName: "",
+            lastName: "",
+            subject: [],
+          },
+        });
 
-    // Амжилттай хариу буцаах
-    res.status(201).json(newUser);
-    return;
+        // User-ийг шинэчилж teacherId-г хадгална
+        await prisma.user.update({
+          where: { id: newUser.id },
+          data: { teacherId: teacher.id },
+        });
+      }
+
+      if (role === "student") {
+        const student = await prisma.student.create({
+          data: {
+            user: { connect: { id: newUser.id } },
+            email: newUser.email,
+            firstName: "",
+            lastName: "",
+            class: classId ? { connect: { id: classId } } : undefined, // Хэрэв classId өгөгдсөн бол холбох
+          },
+        });
+
+        // User-ийг шинэчилж studentId-г хадгална
+        await prisma.user.update({
+          where: { id: newUser.id },
+          data: { studentId: student.id },
+        });
+      }
+
+      // Амжилттай хариу буцаах
+      res.status(201).json({ success: true, user: newUser });
+      return;
+    }
   } catch (err) {
     console.error("❌ Error creating user:", err);
     res.status(500).json({ error: "Хэрэглэгч үүсгэхэд алдаа гарлаа." });
