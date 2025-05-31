@@ -1,40 +1,68 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createClass = void 0;
+exports.checkClass = exports.createClass = void 0;
 const client_1 = require("@prisma/client");
 const PromoCodeGenerator_1 = require("../utils/PromoCodeGenerator");
 const prisma = new client_1.PrismaClient();
 const createClass = async (req, res) => {
     try {
-        const { name, teacherId, promoCode } = req.body;
-        if (!name || !teacherId) {
-            return res.status(400).json({ message: "Анги нэр болон багшийн ID заавал шаардлагатай." });
+        const { name, userId, promoCode } = req.body;
+        if (!name || !userId) {
+            res.status(400).json({ message: "Анги нэр болон хэрэглэгчийн ID шаардлагатай." });
+            return;
         }
-        // ✅ Багшийн ID үнэхээр `Teacher` хүснэгтэд байгаа эсэхийг шалгана
-        const teacherExists = await prisma.teacher.findUnique({
-            where: { id: teacherId },
+        // 🔍 Хэрэглэгчийн ID-аас багшийн ID-г олно
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: { teacher: true },
         });
-        if (!teacherExists) {
-            return res.status(400).json({ message: "Ийм ID-тай багш олдсонгүй." });
+        if (!user || !user.teacher) {
+            res.status(400).json({ message: "Багш олдсонгүй." });
+            return;
         }
-        // ✅ Промо код ашиглах буюу шинээр үүсгэх
         const finalPromoCode = promoCode || (0, PromoCodeGenerator_1.generatePromoCode)(name);
         const newClass = await prisma.class.create({
             data: {
                 name,
-                teacherId,
+                teacherId: user.teacher.id,
                 promoCode: finalPromoCode,
             },
         });
-        return res.status(201).json(newClass);
+        res.status(201).json(newClass);
+        return;
     }
     catch (error) {
         console.error("❌ Error while creating class:", error);
         if (error.code === "P2002" && error.meta?.target?.includes("promoCode")) {
-            return res.status(409).json({ message: "Промо код давхцаж байна. Өөр код оруулна уу." });
+            res.status(409).json({ message: "Промо код давхцаж байна." });
+            return;
         }
-        return res.status(500).json({ message: "Анги үүсгэхэд алдаа гарлаа." });
+        res.status(500).json({ message: "Анги үүсгэхэд алдаа гарлаа." });
+        return;
     }
 };
 exports.createClass = createClass;
+//Check if class exists by promo code
+const checkClass = async (req, res) => {
+    try {
+        const { promoCode } = req.body;
+        if (!promoCode) {
+            res.status(400).json({ message: "код шаардлагатай." });
+            return;
+        }
+        const existingClass = await prisma.class.findUnique({
+            where: { promoCode },
+        });
+        if (!existingClass) {
+            res.status(404).json({ message: "Анги олдсонгүй." });
+            return;
+        }
+        res.status(200).json({ success: true, class: existingClass });
+    }
+    catch (error) {
+        console.error("❌ Error while checking class:", error);
+        res.status(500).json({ message: "Анги шалгахад алдаа гарлаа." });
+    }
+};
+exports.checkClass = checkClass;
 //# sourceMappingURL=ClassController.js.map

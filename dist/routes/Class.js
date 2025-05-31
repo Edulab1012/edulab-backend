@@ -7,5 +7,6 @@ const express_1 = __importDefault(require("express"));
 const ClassController_1 = require("../controllers/ClassController");
 const router = express_1.default.Router();
 router.post("/create", ClassController_1.createClass);
+router.post("/joinClass", ClassController_1.checkClass);
 exports.default = router;
 //# sourceMappingURL=class.js.map
