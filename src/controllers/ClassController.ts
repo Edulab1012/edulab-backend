@@ -132,3 +132,37 @@ export const getClassStudents = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Failed to fetch class students" });
   }
 };
+
+// Add this to your ClassController.ts
+export const deleteClass = async (req: Request, res: Response) => {
+  try {
+    const { classId } = req.params;
+
+    // First check if the class exists
+    const existingClass = await prisma.class.findUnique({
+      where: { id: classId },
+    });
+
+    if (!existingClass) {
+      res.status(404).json({ message: "Анги олдсонгүй." });
+      return;
+    }
+
+    // Delete all student enrollments first
+    await prisma.student.deleteMany({
+      where: { classId },
+    });
+
+    // Then delete the class
+    await prisma.class.delete({
+      where: { id: classId },
+    });
+
+    res
+      .status(200)
+      .json({ success: true, message: "Анги амжилттай устгагдлаа." });
+  } catch (error) {
+    console.error("❌ Error while deleting class:", error);
+    res.status(500).json({ message: "Анги устгахад алдаа гарлаа." });
+  }
+};
