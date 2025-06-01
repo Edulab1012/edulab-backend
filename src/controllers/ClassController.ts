@@ -88,7 +88,6 @@ export const getTeacherClasses = async (req: Request, res: Response) => {
         name: true,
         createdAt: true,
         promoCode: true,
-        // We don't include students here for performance
       },
     });
 
