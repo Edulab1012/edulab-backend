@@ -60,6 +60,15 @@ export const createUser = async (req: Request, res: Response) => {
         where: { id: newUser.id },
         data: { teacherId: teacher.id },
       });
+      res.status(201).json({
+        success: true,
+        user: newUser,
+        teacher: {
+          id: teacher.id,
+          email: teacher.email,
+        },
+      });
+      return;
     }
 
     if (role === "student") {
