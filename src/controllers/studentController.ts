@@ -200,3 +200,17 @@ export const getAllStudents = async (
       .json({ error: "Сурагчдын мэдээллийг авахад алдаа гарлаа." });
   }
 };
+
+
+
+export const addProfile = async (req: Request, res: Response) => {
+  try {
+    const profile = req.body;
+    console.log(profile);
+    
+    res.status(200).send("avchlaa");
+  } catch (error) {
+    console.error("Error in addProfile:", error);
+    res.status(500).json({ error: "Серверийн алдаа гарлаа" });
+  }
+};
