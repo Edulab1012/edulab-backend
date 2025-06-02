@@ -1,10 +1,10 @@
 import express from "express";
 import {
-  checkClass,
-  createClass,
-  getTeacherClasses,
-  getClassStudents,
-  deleteClass,
+    checkClass,
+    createClass,
+    getTeacherClasses,
+    getClassStudents,
+    deleteClass,
 } from "../controllers/ClassController";
 
 const router = express.Router();
