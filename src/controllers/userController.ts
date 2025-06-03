@@ -15,7 +15,7 @@ export const createUser = async (req: Request, res: Response) => {
     if (existingUser) {
       res
         .status(403)
-        .json({ message: "❌ Хэрэглэгч аль хэдийн бүртгэгдсэн байна." });
+        .json({ message: " Имэйл бүртгэгдсэн байна. Нэвтэрнэ үү." });
       return;
     }
 
@@ -26,7 +26,7 @@ export const createUser = async (req: Request, res: Response) => {
     if (existingUsername) {
       res
         .status(409)
-        .json({ message: "❗ Энэ хэрэглэгчийн нэр аль хэдийн байна." });
+        .json({ message: " Нэр давхцаж байна. Өөр нэр сонгоно уу." });
       return;
     }
 
@@ -46,30 +46,24 @@ export const createUser = async (req: Request, res: Response) => {
     if (role === "teacher") {
       const teacher = await prisma.teacher.create({
         data: {
-          user: { connect: { id: newUser.id } },
+          userId: newUser.id,
           email: newUser.email,
           firstName: "",
           lastName: "",
           subject: [],
-          password: hashedPassword, // Store the same hashed password in Teacher table
+          password: hashedPassword,
         },
       });
 
-      // Update user with teacherId
-      await prisma.user.update({
-        where: { id: newUser.id },
-        data: { teacherId: teacher.id },
-      });
       res.status(201).json({
         success: true,
         user: newUser,
-        teacher: {
-          id: teacher.id,
-          email: teacher.email,
-        },
+        teacher,
       });
       return;
     }
+
+
 
     if (role === "student") {
       const student = await prisma.student.create({
@@ -82,14 +76,9 @@ export const createUser = async (req: Request, res: Response) => {
         },
       });
 
-      // Update user with studentId
-      await prisma.user.update({
-        where: { id: newUser.id },
-        data: { studentId: student.id },
-      });
-    }
 
-    res.status(201).json({ success: true, user: newUser });
+      res.status(201).json({ success: true, user: newUser, student });
+    }
     return;
   } catch (err) {
     console.error("❌ Error creating user:", err);

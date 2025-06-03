@@ -4,7 +4,7 @@ import { Request, Response } from "express";
 
 import authRoutes from "./routes/auth";
 // import teacherRoutes from "./routes/teacher";
-import studentRoutes from "./routes/student";
+// import studentRoutes from "./routes/student";
 import classRoutes from "./routes/class";
 
 const app = express();
@@ -20,7 +20,7 @@ app.use(
 
 app.use("/api/v1/auth", authRoutes);
 // app.use("/api/v1/teacher", teacherRoutes);
-app.use("/api/v1/student", studentRoutes);
+// app.use("/api/v1/student", studentRoutes);
 app.use("/api/v1/class", classRoutes);
 
 app.get("/", (req: Request, res: Response) => {
