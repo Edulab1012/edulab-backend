@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { generatePromoCode } from "../utils/PromoCodeGenerator";
 import { Request, Response } from "express";
+import { X509Certificate } from "crypto";
 
 const prisma = new PrismaClient();
 
@@ -135,7 +136,7 @@ export const getClassStudents = async (req: Request, res: Response) => {
 
 // Add this to your ClassController.ts
 export const deleteClass = async (req: Request, res: Response) => {
-  try {
+  try {X509Certificate
     const { classId } = req.params;
 
     // First check if the class exists
@@ -148,10 +149,6 @@ export const deleteClass = async (req: Request, res: Response) => {
       return;
     }
 
-    // Delete all student enrollments first
-    await prisma.student.deleteMany({
-      where: { classId },
-    });
 
     // Then delete the class
     await prisma.class.delete({

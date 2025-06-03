@@ -1,15 +1,34 @@
 import express from "express";
 import cors from "cors";
 import { Request, Response } from "express";
-
+import postRoutes from "./routes/post";
 import authRoutes from "./routes/auth";
 // import teacherRoutes from "./routes/teacher";
-// import studentRoutes from "./routes/student";
+import studentRoutes from "./routes/student";
 import classRoutes from "./routes/class";
+import { createServer } from "http";
+import { createClient } from '@supabase/supabase-js';
+
+
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+const supabaseUrl = process.env.SUPABASE_URL || 'your-supabase-url';
+const supabaseKey = process.env.SUPABASE_KEY || 'your-supabase-key';
+export const supabase = createClient(supabaseUrl, supabaseKey);
+
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
+
+
 app.use(
   cors({
     origin: "http://localhost:3000",
@@ -20,8 +39,10 @@ app.use(
 
 app.use("/api/v1/auth", authRoutes);
 // app.use("/api/v1/teacher", teacherRoutes);
-// app.use("/api/v1/student", studentRoutes);
+app.use("/api/v1/student", studentRoutes);
+app.use("/api/v1/posts", postRoutes);
 app.use("/api/v1/class", classRoutes);
+
 
 app.get("/", (req: Request, res: Response) => {
   try {
@@ -31,6 +52,7 @@ app.get("/", (req: Request, res: Response) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 const PORT = process.env.PORT || 8000;
 
