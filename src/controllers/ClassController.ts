@@ -148,10 +148,6 @@ export const deleteClass = async (req: Request, res: Response) => {
       return;
     }
 
-    // Delete all student enrollments first
-    await prisma.student.deleteMany({
-      where: { classId },
-    });
 
     // Then delete the class
     await prisma.class.delete({
