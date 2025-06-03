@@ -3,9 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -18,11 +17,8 @@ model User {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  teacherId String? @unique
-  studentId String? @unique
-
-  teacher Teacher? @relation("TeacherUser", fields: [teacherId], references: [id])
-  student Student? @relation("StudentUser", fields: [studentId], references: [id])
+  teacher Teacher? @relation("TeacherUser")
+  student Student? @relation("StudentUser")
 }
 
 model Teacher {
@@ -35,21 +31,12 @@ model Teacher {
   emergencyNumber String?
   subject         String[]
 
-  user       User?        @relation("TeacherUser")
+  userId     String       @unique
+  user       User         @relation("TeacherUser", fields: [userId], references: [id], onDelete: Cascade)
   Attendance Attendance[]
 
   classes  Class[]   @relation("TeacherClass")
   students Student[]
-}
-
-model Class {
-  id        String    @id @default(uuid())
-  name      String
-  promoCode String?   @unique
-  createdAt DateTime  @default(now())
-  teacher   Teacher?  @relation("TeacherClass", fields: [teacherId], references: [id])
-  teacherId String?
-  students  Student[]
 }
 
 model Student {
@@ -67,9 +54,20 @@ model Student {
   teacherId String?
   teacher   Teacher? @relation(fields: [teacherId], references: [id])
 
-  user       User?        @relation("StudentUser")
+  userId     String       @unique
+  user       User         @relation("StudentUser", fields: [userId], references: [id], onDelete: Cascade)
   attendance Attendance[]
   scores     Score[]
+}
+
+model Class {
+  id        String    @id @default(uuid())
+  name      String
+  promoCode String?   @unique
+  createdAt DateTime  @default(now())
+  teacher   Teacher?  @relation("TeacherClass", fields: [teacherId], references: [id])
+  teacherId String?
+  students  Student[]
 }
 
 model Attendance {
