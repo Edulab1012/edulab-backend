@@ -19,6 +19,10 @@ model User {
 
   teacher Teacher? @relation("TeacherUser")
   student Student? @relation("StudentUser")
+
+  Planner  Planner[]
+  posts    Post[]
+  comments Comment[]
 }
 
 model Teacher {
@@ -91,6 +95,39 @@ model Score {
   exam       Float
   studentId  String
   student    Student @relation(fields: [studentId], references: [id])
+}
+
+model Planner {
+  id        String   @id @default(cuid())
+  title     String
+  day       String?
+  completed Boolean  @default(false)
+  priority  String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Post {
+  id        String    @id @default(cuid())
+  title     String
+  content   String
+  imageUrl  String?
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments  Comment[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
 }
 
 enum AttendanceStatus {
