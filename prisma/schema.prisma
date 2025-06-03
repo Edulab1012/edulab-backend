@@ -18,12 +18,11 @@ model User {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  teacher Teacher? @relation("TeacherUser")
-  student Student? @relation("StudentUser")
-
-  Planner  Planner[]
-  posts    Post[]
-  comments Comment[]
+  teacher   Teacher?  @relation("TeacherUser")
+  student   Student?  @relation("StudentUser")
+  Planner   Planner[]
+  posts     Post[]
+  comments  Comment[]
 }
 
 model Teacher {
@@ -36,33 +35,35 @@ model Teacher {
   emergencyNumber String?
   subject         String[]
 
-  userId     String       @unique
-  user       User         @relation("TeacherUser", fields: [userId], references: [id], onDelete: Cascade)
-  Attendance Attendance[]
-
-  classes  Class[]   @relation("TeacherClass")
-  students Student[]
+  userId      String       @unique
+  user        User         @relation("TeacherUser", fields: [userId], references: [id], onDelete: Cascade)
+  Attendance  Attendance[]
+  classes     Class[]      @relation("TeacherClass")
+  students    Student[]
+  posts       Post[]  @relation("TeacherPosts") 
 }
 
 model Student {
-  id              String  @id @default(uuid())
+  id              String   @id @default(uuid())
   firstName       String
   lastName        String
-  email           String? @unique
+  email           String?  @unique
   phoneNumber     String?
   emergencyNumber String?
-  gender          Gender? @default(male)
+  gender          Gender?  @default(male)
 
-  classId String?
-  class   Class?  @relation(fields: [classId], references: [id])
+  classId   String?
+  class     Class?   @relation(fields: [classId], references: [id], onDelete: SetNull)
 
   teacherId String?
-  teacher   Teacher? @relation(fields: [teacherId], references: [id])
+  teacher   Teacher? @relation(fields: [teacherId], references: [id], onDelete: SetNull)
 
-  userId     String       @unique
-  user       User         @relation("StudentUser", fields: [userId], references: [id], onDelete: Cascade)
-  attendance Attendance[]
-  scores     Score[]
+  userId      String       @unique
+  user        User         @relation("StudentUser", fields: [userId], references: [id], onDelete: Cascade)
+  attendance  Attendance[]
+  scores      Score[]
+  comments    Comment[] @relation("StudentComments") 
+  
 }
 
 model Class {
@@ -73,6 +74,7 @@ model Class {
   teacher   Teacher?  @relation("TeacherClass", fields: [teacherId], references: [id])
   teacherId String?
   students  Student[]
+  posts     Post[]
 }
 
 model Attendance {
@@ -82,8 +84,8 @@ model Attendance {
   studentId String
   teacherId String
 
-  student Student @relation(fields: [studentId], references: [id])
-  teacher Teacher @relation(fields: [teacherId], references: [id])
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  teacher Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
 
   @@unique([studentId, teacherId, date])
 }
@@ -95,7 +97,7 @@ model Score {
   active     Float
   exam       Float
   studentId  String
-  student    Student @relation(fields: [studentId], references: [id])
+  student    Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 }
 
 model Planner {
@@ -105,7 +107,7 @@ model Planner {
   completed Boolean  @default(false)
   priority  String?
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 }
 
@@ -119,6 +121,10 @@ model Post {
   comments  Comment[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  classId   String
+  class     Class     @relation(fields: [classId], references: [id], onDelete: Cascade)
+   teacher   Teacher?  @relation("TeacherPosts", fields: [teacherId], references: [id])
+  teacherId String?
 }
 
 model Comment {
@@ -129,6 +135,8 @@ model Comment {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
+   student   Student? @relation("StudentComments", fields: [studentId], references: [id])
+  studentId String?
 }
 
 enum AttendanceStatus {

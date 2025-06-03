@@ -1,16 +1,9 @@
-// import express from "express";
-// import {
-//   addStudent,
-//   getAllStudents,
-//   getStudentsByTeacher,
-// } from "../controllers/studentController";
+// routes/studentRoutes.ts
+import express from "express";
+import { getStudent } from "../controllers/studentController";
 
-// const router = express.Router();
+const router = express.Router();
 
-// router
-//   .post("/", addStudent)
-//   .get("/", getAllStudents)
-//   .get("/withStudents", getStudentsByTeacher); // 🧩 Энэ функц нь зөвхөн сурагчийн мэдээлэл төдийгүй,
-// // багш, бүлэг, анги зэрэг бүх холбоотой мэдээллийг хамтад нь өгдөг.
+router.get("/:studentId", getStudent);
 
-// export default router;
+export default router;
