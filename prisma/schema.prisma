@@ -28,12 +28,13 @@ model Teacher {
   id              String   @id @default(uuid())
   firstName       String
   lastName        String
+  fullName        String?
+  avatarUrl       String?
   email           String   @unique
   phoneNumber     String?
   password        String?  @default("teacher1234")
   emergencyNumber String?
   subject         String[]
-
 
   userId     String       @unique
   user       User         @relation("TeacherUser", fields: [userId], references: [id], onDelete: Cascade)
@@ -48,8 +49,10 @@ model Student {
   firstName       String
   lastName        String
   email           String? @unique
+  avatarUrl       String?
   phoneNumber     String?
   emergencyNumber String?
+  fullName        String?
   gender          Gender? @default(male)
 
   classId String?
@@ -74,7 +77,7 @@ model Class {
   teacherId String?
   students  Student[]
 
-  posts     Post[]
+  posts Post[]
 }
 
 model Attendance {
