@@ -1,6 +1,7 @@
 import { Request, response, Response } from "express";
 import bcrypt from "bcrypt";
 import { PrismaClient } from "@prisma/client";
+import jwt from "jsonwebtoken";
 import prisma from "../prisma/client";
 //Create User ➕
 
@@ -54,16 +55,11 @@ export const createUser = async (req: Request, res: Response) => {
           password: hashedPassword,
         },
       });
-
-      res.status(201).json({
-        success: true,
-        user: newUser,
-        teacher,
-      });
+      //✅
+      const token = createToken({ teacher });
+      res.status(201).json({ success: true, user: newUser, teacher: { id: teacher?.id }, token });
       return;
     }
-
-
 
     if (role === "student") {
       const student = await prisma.student.create({
@@ -75,9 +71,9 @@ export const createUser = async (req: Request, res: Response) => {
           class: classId ? { connect: { id: classId } } : undefined,
         },
       });
-
-
-      res.status(201).json({ success: true, user: newUser, student });
+      //✅
+      const token = createToken({ student });
+      res.status(201).json({ success: true, user: newUser, student: { id: student?.id }, token });
     }
     return;
   } catch (err) {
@@ -114,6 +110,7 @@ export const checkUser = async (req: Request, res: Response) => {
 
     if (user.role === "teacher") {
       const teacher = await prisma.teacher.findFirst({ where: { email } })
+      const token = createToken({ teacher });
       res.status(200).json({
         message: "✅ Teacher authenticated successfully",
         success: true,
@@ -121,12 +118,13 @@ export const checkUser = async (req: Request, res: Response) => {
           id: user.id,
           role: user.role
         },
-        teacher
+        student: { id: teacher?.id },
+        token
       });
     }
     if (user.role === "student") {
-
       const student = await prisma.student.findFirst({ where: { email } })
+      const token = createToken({ student });
       res.status(200).json({
         message: "✅ Student authenticated successfully",
         success: true,
@@ -134,7 +132,9 @@ export const checkUser = async (req: Request, res: Response) => {
           id: user.id,
           role: user.role
         },
-        student
+        student: { id: student?.id },
+        token
+
       });
     }
 
@@ -152,4 +152,12 @@ export const getAllUsers = async (req: Request, res: Response) => {
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch users" });
   }
+};
+
+
+
+// TOKEN uusgegch function 
+const createToken = (payload: object) => {
+  if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET is not defined");
+  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "7d" });
 };
