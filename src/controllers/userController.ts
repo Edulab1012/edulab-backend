@@ -118,7 +118,7 @@ export const checkUser = async (req: Request, res: Response) => {
           id: user.id,
           role: user.role
         },
-        student: { id: teacher?.id },
+        teacher: { id: teacher?.id },
         token
       });
     }
