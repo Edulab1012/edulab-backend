@@ -113,31 +113,31 @@ export const checkUser = async (req: Request, res: Response) => {
     }
 
     if (user.role === "teacher") {
+      const teacher = await prisma.teacher.findFirst({ where: { email } })
       res.status(200).json({
         message: "✅ Teacher authenticated successfully",
         success: true,
         user: {
           id: user.id,
-          username: user.username,
-          email: user.email,
-          role: user.role,
-          teacherId: user.teacher ? user.teacher.id : null,
+          role: user.role
         },
+        teacher
       });
     }
     if (user.role === "student") {
+
+      const student = await prisma.student.findFirst({ where: { email } })
       res.status(200).json({
         message: "✅ Student authenticated successfully",
         success: true,
         user: {
           id: user.id,
-          username: user.username,
-          email: user.email,
-          role: user.role,
-          studentId: user.student ? user.student.id : null,
+          role: user.role
         },
+        student
       });
     }
+
   } catch (err: any) {
     console.log("❌ Login error:", err);
     res.status(500).json({ message: "❌ Failed to check user", error: err });

@@ -8,6 +8,7 @@ import studentRoutes from "./routes/student";
 import classRoutes from "./routes/class";
 import { createServer } from "http";
 import { createClient } from '@supabase/supabase-js';
+import { createClass } from "./controllers/ClassController";
 
 
 

@@ -35,9 +35,11 @@ export const createClass = async (req: Request, res: Response) => {
         teacherId: user.teacher.id,
         promoCode: finalPromoCode,
       },
+
     });
 
     res.status(201).json(newClass);
+
     return;
   } catch (error: any) {
     console.error("❌ Error while creating class:", error);
@@ -136,7 +138,8 @@ export const getClassStudents = async (req: Request, res: Response) => {
 
 // Add this to your ClassController.ts
 export const deleteClass = async (req: Request, res: Response) => {
-  try {X509Certificate
+  try {
+    X509Certificate
     const { classId } = req.params;
 
     // First check if the class exists
