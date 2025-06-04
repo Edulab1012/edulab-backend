@@ -34,7 +34,6 @@ model Teacher {
   emergencyNumber String?
   subject         String[]
 
-
   userId     String       @unique
   user       User         @relation("TeacherUser", fields: [userId], references: [id], onDelete: Cascade)
   Attendance Attendance[]
@@ -74,7 +73,7 @@ model Class {
   teacherId String?
   students  Student[]
 
-  posts     Post[]
+  posts Post[]
 }
 
 model Attendance {
