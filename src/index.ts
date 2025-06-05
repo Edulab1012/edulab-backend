@@ -22,7 +22,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
 
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://edulab-frontend-kappa.vercel.app/"],
+    origin: ["http://localhost:3000", "https://edulab-frontend-kappa.vercel.app/", "https://edulab-frontend-git-main-edulabs-projects.vercel.app/"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
   })

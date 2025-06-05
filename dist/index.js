@@ -21,7 +21,7 @@ const supabaseUrl = process.env.SUPABASE_URL || "https://iuuliuoqgudrqrjfdsuo.su
 const supabaseKey = process.env.SUPABASE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1dWxpdW9xZ3VkcnFyamZkc3VvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgwMzczODIsImV4cCI6MjA2MzYxMzM4Mn0.Sw85JlpgRLP8P_dXBn9Fa5rnnjHez62v85U5v1ps9KA";
 exports.supabase = (0, supabase_js_1.createClient)(supabaseUrl, supabaseKey);
 app.use((0, cors_1.default)({
-    origin: ["http://localhost:3000", "https://edulab-frontend-kappa.vercel.app/"],
+    origin: ["http://localhost:3000", "https://edulab-frontend-kappa.vercel.app/", "https://edulab-frontend-git-main-edulabs-projects.vercel.app/"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
 }));
