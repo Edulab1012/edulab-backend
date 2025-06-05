@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteClass = exports.getClassStudents = exports.getTeacherClasses = exports.checkClass = exports.createClass = void 0;
 const client_1 = require("@prisma/client");
 const PromoCodeGenerator_1 = require("../utils/PromoCodeGenerator");
+const crypto_1 = require("crypto");
 const prisma = new client_1.PrismaClient();
 const createClass = async (req, res) => {
     try {
@@ -125,6 +126,7 @@ exports.getClassStudents = getClassStudents;
 // Add this to your ClassController.ts
 const deleteClass = async (req, res) => {
     try {
+        crypto_1.X509Certificate;
         const { classId } = req.params;
         // First check if the class exists
         const existingClass = await prisma.class.findUnique({
@@ -134,10 +136,6 @@ const deleteClass = async (req, res) => {
             res.status(404).json({ message: "Анги олдсонгүй." });
             return;
         }
-        // Delete all student enrollments first
-        await prisma.student.deleteMany({
-            where: { classId },
-        });
         // Then delete the class
         await prisma.class.delete({
             where: { id: classId },

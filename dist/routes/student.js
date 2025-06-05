@@ -1,15 +1,12 @@
 "use strict";
-// import express from "express";
-// import {
-//   addStudent,
-//   getAllStudents,
-//   getStudentsByTeacher,
-// } from "../controllers/studentController";
-// const router = express.Router();
-// router
-//   .post("/", addStudent)
-//   .get("/", getAllStudents)
-//   .get("/withStudents", getStudentsByTeacher); // 🧩 Энэ функц нь зөвхөн сурагчийн мэдээлэл төдийгүй,
-// // багш, бүлэг, анги зэрэг бүх холбоотой мэдээллийг хамтад нь өгдөг.
-// export default router;
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const studentController_1 = require("../controllers/studentController");
+const router = express_1.default.Router();
+router.get("/:studentId", studentController_1.getStudent);
+router.put("/:studentId/avatar", studentController_1.updateStudentAvatar);
+exports.default = router;
 //# sourceMappingURL=student.js.map

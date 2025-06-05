@@ -13,6 +13,8 @@ model User {
   phoneNumber String?  @unique
   email       String   @unique
   role        UserRole
+  classId     String?
+  class       Class?   @relation("UserClass", fields: [classId], references: [id], onDelete: SetNull)
   password    String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -76,8 +78,8 @@ model Class {
   teacher   Teacher?  @relation("TeacherClass", fields: [teacherId], references: [id])
   teacherId String?
   students  Student[]
-
-  posts Post[]
+  users     User[]    @relation("UserClass")
+  posts     Post[]
 }
 
 model Attendance {
