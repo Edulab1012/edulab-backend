@@ -1,21 +1,10 @@
 // import { Router } from "express";
-// import {
-//   checkUser,
-//   createUser,
-//   getAllUsers,
-// } from "../controllers/userController";
-// import {
-//   addTeacher,
-//   getStudentsWithAttendance,
-//   submitAttendance,
-//   getTodaysAttendance,
-// } from "../controllers/teacherController";
+// import attendanceRouter from "./attendance";
+// import { getStudentsWithAttendance } from "../controllers/teacherController";
 
 // const router = Router();
-// router
-//   .post("/", addTeacher)
-//   // .get("/withStudents", getStudentsWithAttendance)
-//   .post("/attendance", submitAttendance)
-// // .get("/attendance/today", getTodaysAttendance);
+
+// router.get("/withStudents", getStudentsWithAttendance);
+// router.use("/attendance", attendanceRouter);
 
 // export default router;

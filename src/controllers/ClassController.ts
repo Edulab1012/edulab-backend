@@ -35,7 +35,6 @@ export const createClass = async (req: Request, res: Response) => {
         teacherId: user.teacher.id,
         promoCode: finalPromoCode,
       },
-
     });
 
     res.status(201).json(newClass);
@@ -105,7 +104,7 @@ export const getTeacherClasses = async (req: Request, res: Response) => {
 export const getClassStudents = async (req: Request, res: Response) => {
   try {
     const { classId } = req.params;
-
+    console.log("Fetching students for class ID:", classId);
     const classWithStudents = await prisma.class.findUnique({
       where: { id: classId },
       include: {
@@ -139,7 +138,7 @@ export const getClassStudents = async (req: Request, res: Response) => {
 // Add this to your ClassController.ts
 export const deleteClass = async (req: Request, res: Response) => {
   try {
-    X509Certificate
+    X509Certificate;
     const { classId } = req.params;
 
     // First check if the class exists
@@ -151,7 +150,6 @@ export const deleteClass = async (req: Request, res: Response) => {
       res.status(404).json({ message: "Анги олдсонгүй." });
       return;
     }
-
 
     // Then delete the class
     await prisma.class.delete({
