@@ -25,7 +25,7 @@ app.use((0, cors_1.default)({
     allowedHeaders: ["Content-Type", "Authorization"],
 }));
 app.use((0, cors_1.default)({
-    origin: "http://localhost:3000",
+    origin: ["http://localhost:3000", "https://edulab-frontend-kappa.vercel.app"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
 }));

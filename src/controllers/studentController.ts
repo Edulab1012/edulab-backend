@@ -56,3 +56,25 @@ export const updateStudentAvatar = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Failed to update avatar" });
   }
 };
+
+export const updateStudentBg = async (req: Request, res: Response) => {
+  try {
+    const { studentId } = req.params;
+    const { bgUrl } = req.body;
+
+    if (!bgUrl) {
+      res.status(400).json({ message: "bgUrl is required" });
+      return
+    }
+
+    const updatedStudent = await prisma.student.update({
+      where: { id: studentId },
+      data: { bgImage: bgUrl },
+    });
+
+    res.status(200).json({ message: "BG updated", student: updatedStudent });
+  } catch (error) {
+    console.error("Error updating student BG:", error);
+    res.status(500).json({ message: "Failed to update BG" });
+  }
+};

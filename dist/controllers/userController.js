@@ -10,7 +10,7 @@ const client_1 = __importDefault(require("../prisma/client"));
 //Create User ➕
 const createUser = async (req, res) => {
     try {
-        const { username, email, password, role, classId } = req.body;
+        const { username, email, firstName, phoneNumber, password, role, classId } = req.body;
         const existingUser = await client_1.default.user.findFirst({
             where: { email },
         });
@@ -37,7 +37,6 @@ const createUser = async (req, res) => {
                 email,
                 password: hashedPassword,
                 role,
-                classId
             },
         });
         // Depending on role, create related models
@@ -54,7 +53,12 @@ const createUser = async (req, res) => {
             });
             //✅
             const token = createToken({ teacher });
-            res.status(201).json({ success: true, user: newUser, teacher: { id: teacher?.id }, token });
+            res.status(201).json({
+                success: true,
+                user: newUser,
+                teacher: { id: teacher?.id },
+                token,
+            });
             return;
         }
         if (role === "student") {
@@ -62,14 +66,20 @@ const createUser = async (req, res) => {
                 data: {
                     user: { connect: { id: newUser.id } },
                     email: newUser.email,
-                    firstName: "",
+                    firstName: firstName,
                     lastName: "",
+                    phoneNumber: newUser.phoneNumber,
                     class: classId ? { connect: { id: classId } } : undefined,
                 },
             });
             //✅
             const token = createToken({ student });
-            res.status(201).json({ success: true, user: newUser, student: { id: student?.id }, token });
+            res.status(201).json({
+                success: true,
+                user: newUser,
+                student: { id: student?.id },
+                token,
+            });
         }
         return;
     }
@@ -108,10 +118,10 @@ const checkUser = async (req, res) => {
                 success: true,
                 user: {
                     id: user.id,
-                    role: user.role
+                    role: user.role,
                 },
                 teacher: { id: teacher?.id },
-                token
+                token,
             });
         }
         if (user.role === "student") {
@@ -122,10 +132,10 @@ const checkUser = async (req, res) => {
                 success: true,
                 user: {
                     id: user.id,
-                    role: user.role
+                    role: user.role,
                 },
                 student: { id: student?.id },
-                token
+                token,
             });
         }
     }
@@ -146,7 +156,7 @@ const getAllUsers = async (req, res) => {
     }
 };
 exports.getAllUsers = getAllUsers;
-// TOKEN uusgegch function 
+// TOKEN uusgegch function
 const createToken = (payload) => {
     if (!process.env.JWT_SECRET)
         throw new Error("JWT_SECRET is not defined");
@@ -164,11 +174,21 @@ const googleAuth = async (req, res) => {
             const existingUser = await client_1.default.user.findFirst({ where: { email }, include: { teacher: true, student: true } });
             const token = createToken({ existingUser });
             if (existingUser && existingUser.role == "teacher") {
-                res.status(200).json({ success: true, user: existingUser, teacher: { id: existingUser.teacher?.id }, token });
+                res.status(200).json({
+                    success: true,
+                    user: existingUser,
+                    teacher: { id: existingUser.teacher?.id },
+                    token,
+                });
                 return;
             }
             if (existingUser && existingUser.role == "student") {
-                res.status(200).json({ success: true, user: existingUser, student: { id: existingUser.student?.id }, token });
+                res.status(200).json({
+                    success: true,
+                    user: existingUser,
+                    student: { id: existingUser.student?.id },
+                    token,
+                });
                 return;
             }
         }
@@ -183,7 +203,6 @@ const googleAuth = async (req, res) => {
                 username: fullName ?? email,
                 role,
                 password: defaultPassword,
-                classId
             }
         });
         // 🌱 Create role-based Teacher

@@ -16,21 +16,15 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const supabaseUrl = process.env.SUPABASE_URL || "your-supabase-url";
-const supabaseKey = process.env.SUPABASE_KEY || "your-supabase-key";
+const supabaseUrl = process.env.SUPABASE_URL || "postgresql://postgres.iuuliuoqgudrqrjfdsuo:Edulab1a2b%24@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres";
+const supabaseKey = process.env.SUPABASE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1dWxpdW9xZ3VkcnFyamZkc3VvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgwMzczODIsImV4cCI6MjA2MzYxMzM4Mn0.Sw85JlpgRLP8P_dXBn9Fa5rnnjHez62v85U5v1ps9KA";
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-    credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: ["http://localhost:3000", "https://edulab-frontend-kappa.vercel.app"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
   })

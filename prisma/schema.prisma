@@ -21,7 +21,7 @@ model User {
 
   teacher  Teacher?  @relation("TeacherUser")
   student  Student?  @relation("StudentUser")
-  Planner  Planner[]
+  task     Task[]
   posts    Post[]
   comments Comment[]
   messages Message[]
@@ -53,6 +53,7 @@ model Student {
   lastName        String
   email           String? @unique
   avatarUrl       String?
+  bgImage         String?
   phoneNumber     String?
   emergencyNumber String?
   fullName        String?
@@ -117,15 +118,29 @@ model Message {
   created_at   DateTime @default(now())
 }
 
-model Planner {
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model Task {
   id        String   @id @default(cuid())
   title     String
-  day       String?
+  day       String
   completed Boolean  @default(false)
-  priority  String?
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
+  priority  Priority @default(MEDIUM)
+  order     Int      @default(0)
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, day])
+  @@index([userId, order])
+  @@map("tasks")
 }
 
 model Post {
