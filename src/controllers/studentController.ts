@@ -33,3 +33,26 @@ export const getStudent = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Failed to fetch student" });
   }
 };
+
+//student Avatar profile image uplaod 
+export const updateStudentAvatar = async (req: Request, res: Response) => {
+  try {
+    const { studentId } = req.params;
+    const { avatarUrl } = req.body;
+
+    if (!avatarUrl) {
+      res.status(400).json({ message: "avatarUrl is required" });
+      return
+    }
+
+    const updatedStudent = await prisma.student.update({
+      where: { id: studentId },
+      data: { avatarUrl },
+    });
+
+    res.status(200).json({ message: "Avatar updated", student: updatedStudent });
+  } catch (error) {
+    console.error("Error updating student avatar:", error);
+    res.status(500).json({ message: "Failed to update avatar" });
+  }
+};

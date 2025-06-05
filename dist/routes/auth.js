@@ -8,5 +8,6 @@ const router = (0, express_1.Router)();
 router.post("/register", userController_1.createUser);
 router.post("/login", userController_1.checkUser);
 router.get("/users", userController_1.getAllUsers);
+router.post("/testUser", userController_1.googleAuth);
 exports.default = router;
 //# sourceMappingURL=auth.js.map

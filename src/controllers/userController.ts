@@ -1,6 +1,5 @@
 import { Request, response, Response } from "express";
 import bcrypt from "bcrypt";
-import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
 import prisma from "../prisma/client";
 //Create User ➕
@@ -175,13 +174,13 @@ export const googleAuth = async (req: Request, res: Response) => {
     }
     try {
       const existingUser = await prisma.user.findFirst({ where: { email }, include: { teacher: true, student: true } });
-      const token = existingUser
+      const token = createToken({ existingUser });
       if (existingUser && existingUser.role == "teacher") {
         res.status(200).json({ success: true, user: existingUser, teacher: { id: existingUser.teacher?.id }, token })
         return
       }
       if (existingUser && existingUser.role == "student") {
-        res.status(200).json({ success: true, user: existingUser, teacher: { id: existingUser.student?.id }, token })
+        res.status(200).json({ success: true, user: existingUser, student: { id: existingUser.student?.id }, token })
         return
       }
     } catch (err) { res.status(401).json({ success: false, message: "Existing user" }) }

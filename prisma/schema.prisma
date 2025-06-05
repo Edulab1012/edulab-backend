@@ -14,6 +14,8 @@ model User {
   phoneNumber String?  @unique
   email       String   @unique
   role        UserRole
+  classId     String?
+  class       Class?   @relation("UserClass", fields: [classId], references: [id], onDelete: SetNull)
   password    String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -70,15 +72,17 @@ model Student {
 }
 
 model Class {
-  id           String    @id @default(uuid())
-  name         String
-  promoCode    String?   @unique
-  semesterDays Int?      @default(30) // Add this line
-  createdAt    DateTime  @default(now())
-  teacher      Teacher?  @relation("TeacherClass", fields: [teacherId], references: [id])
-  teacherId    String?
-  students     Student[]
-  posts        Post[]
+
+  id        String    @id @default(uuid())
+  name      String
+  promoCode String?   @unique
+  createdAt DateTime  @default(now())
+  teacher   Teacher?  @relation("TeacherClass", fields: [teacherId], references: [id])
+  teacherId String?
+  students  Student[]
+  users     User[]    @relation("UserClass")
+  posts     Post[]
+
 }
 
 model Attendance {

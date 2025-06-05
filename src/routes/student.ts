@@ -1,9 +1,9 @@
-// routes/studentRoutes.ts
+
 import express from "express";
-import { getStudent } from "../controllers/studentController";
+import { getStudent, updateStudentAvatar } from "../controllers/studentController";
 
 const router = express.Router();
 
-router.get("/:studentId", getStudent);
-
+router.get("/:studentId", getStudent)
+router.put("/:studentId/avatar", updateStudentAvatar);
 export default router;
