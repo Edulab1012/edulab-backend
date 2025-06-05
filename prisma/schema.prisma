@@ -3,9 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -25,6 +24,7 @@ model User {
   Planner  Planner[]
   posts    Post[]
   comments Comment[]
+  messages Message[]
 }
 
 model Teacher {
@@ -72,7 +72,6 @@ model Student {
 }
 
 model Class {
-
   id        String    @id @default(uuid())
   name      String
   promoCode String?   @unique
@@ -82,7 +81,6 @@ model Class {
   students  Student[]
   users     User[]    @relation("UserClass")
   posts     Post[]
-
 }
 
 model Attendance {
@@ -106,6 +104,17 @@ model Score {
   exam       Float
   studentId  String  @unique
   student    Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+
+model Message {
+  id           String   @id @default(uuid())
+  chat_room_id String
+  user_id      String
+  user         User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_name    String
+  avatar_url   String?
+  message      String
+  created_at   DateTime @default(now())
 }
 
 model Planner {

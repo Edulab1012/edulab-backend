@@ -39,6 +39,7 @@ export const createUser = async (req: Request, res: Response) => {
         email,
         password: hashedPassword,
         role,
+        classId
       },
     });
 
@@ -174,6 +175,7 @@ export const googleAuth = async (req: Request, res: Response) => {
     }
     try {
       const existingUser = await prisma.user.findFirst({ where: { email }, include: { teacher: true, student: true } });
+
       const token = createToken({ existingUser });
       if (existingUser && existingUser.role == "teacher") {
         res.status(200).json({ success: true, user: existingUser, teacher: { id: existingUser.teacher?.id }, token })
@@ -194,6 +196,7 @@ export const googleAuth = async (req: Request, res: Response) => {
         username: fullName ?? email,
         role,
         password: defaultPassword,
+        classId
       }
     });
     // 🌱 Create role-based Teacher

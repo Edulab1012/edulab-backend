@@ -37,6 +37,7 @@ const createUser = async (req, res) => {
                 email,
                 password: hashedPassword,
                 role,
+                classId
             },
         });
         // Depending on role, create related models
@@ -182,6 +183,7 @@ const googleAuth = async (req, res) => {
                 username: fullName ?? email,
                 role,
                 password: defaultPassword,
+                classId
             }
         });
         // 🌱 Create role-based Teacher
