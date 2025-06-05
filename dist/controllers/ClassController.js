@@ -94,6 +94,7 @@ exports.getTeacherClasses = getTeacherClasses;
 const getClassStudents = async (req, res) => {
     try {
         const { classId } = req.params;
+        console.log("Fetching students for class ID:", classId);
         const classWithStudents = await prisma.class.findUnique({
             where: { id: classId },
             include: {

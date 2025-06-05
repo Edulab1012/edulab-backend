@@ -1,1 +1,1 @@
-{"version":3,"file":"teacher.js","sourceRoot":"","sources":["../../src/routes/teacher.ts"],"names":[],"mappings":";AAAA,oCAAoC;AACpC,WAAW;AACX,eAAe;AACf,gBAAgB;AAChB,iBAAiB;AACjB,0CAA0C;AAC1C,WAAW;AACX,gBAAgB;AAChB,+BAA+B;AAC/B,sBAAsB;AACtB,yBAAyB;AACzB,6CAA6C;AAE7C,2BAA2B;AAC3B,SAAS;AACT,2BAA2B;AAC3B,wDAAwD;AACxD,2CAA2C;AAC3C,qDAAqD;AAErD,yBAAyB"}
+{"version":3,"file":"teacher.js","sourceRoot":"","sources":["../../src/routes/teacher.ts"],"names":[],"mappings":";AAAA,oCAAoC;AACpC,+CAA+C;AAC/C,gFAAgF;AAEhF,2BAA2B;AAE3B,0DAA0D;AAC1D,+CAA+C;AAE/C,yBAAyB"}
