@@ -4,13 +4,10 @@ import { Request, Response } from "express";
 import postRoutes from "./routes/post";
 import authRoutes from "./routes/auth";
 import attendanceRoutes from "./routes/attendance";
-// import teacherRoutes from "./routes/teacher";
 import studentRoutes from "./routes/student";
 import classRoutes from "./routes/class";
-import { createServer } from "http";
+
 import { createClient } from "@supabase/supabase-js";
-// import semesterRoutes from "./routes/semester";
-import { createClass } from "./controllers/ClassController";
 
 const app = express();
 app.use(cors());
