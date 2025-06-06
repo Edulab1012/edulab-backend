@@ -1,7 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { generatePromoCode } from "../utils/PromoCodeGenerator";
 import { Request, Response } from "express";
-import { X509Certificate } from "crypto";
 
 const prisma = new PrismaClient();
 
@@ -16,7 +15,7 @@ export const createClass = async (req: Request, res: Response) => {
       return;
     }
 
-    // 🔍 Хэрэглэгчийн ID-аас багшийн ID-г олно
+    // Хэрэглэгчийн ID-аас багшийн ID-г олно
     const user = await prisma.user.findUnique({
       where: { id: userId },
       include: { teacher: true },
@@ -27,6 +26,7 @@ export const createClass = async (req: Request, res: Response) => {
       return;
     }
 
+    // Хэрэв хэрэглэгчээс promoCode ирээгүй бол автомат бус код үүсгэнэ
     const finalPromoCode = promoCode || generatePromoCode(name);
 
     const newClass = await prisma.class.create({
@@ -38,8 +38,6 @@ export const createClass = async (req: Request, res: Response) => {
     });
 
     res.status(201).json(newClass);
-
-    return;
   } catch (error: any) {
     console.error("❌ Error while creating class:", error);
 
@@ -49,17 +47,16 @@ export const createClass = async (req: Request, res: Response) => {
     }
 
     res.status(500).json({ message: "Анги үүсгэхэд алдаа гарлаа." });
-    return;
   }
 };
 
-//Check if class exists by promo code
+// Check if class exists by promo code
 export const checkClass = async (req: Request, res: Response) => {
   try {
     const { promoCode } = req.body;
 
     if (!promoCode) {
-      res.status(400).json({ message: "код шаардлагатай." });
+      res.status(400).json({ message: "Код шаардлагатай." });
       return;
     }
 
@@ -78,11 +75,12 @@ export const checkClass = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Анги шалгахад алдаа гарлаа." });
   }
 };
+
 // Get all classes for a teacher
 export const getTeacherClasses = async (req: Request, res: Response) => {
   try {
     const { teacherId } = req.params;
-    console.log(teacherId);
+    console.log("Teacher ID:", teacherId);
     const classes = await prisma.class.findMany({
       where: { teacherId },
       select: {
@@ -121,7 +119,7 @@ export const getClassStudents = async (req: Request, res: Response) => {
     });
 
     if (!classWithStudents) {
-      res.status(404).json({ error: "Class not found" });
+      res.status(404).json({ error: "Анги олдсонгүй." });
       return;
     }
 
@@ -135,13 +133,12 @@ export const getClassStudents = async (req: Request, res: Response) => {
   }
 };
 
-// Add this to your ClassController.ts
+// Delete a specific class
 export const deleteClass = async (req: Request, res: Response) => {
   try {
-    X509Certificate;
     const { classId } = req.params;
 
-    // First check if the class exists
+    // Өмнө нь анги байгаа эсэхийг шалга
     const existingClass = await prisma.class.findUnique({
       where: { id: classId },
     });
@@ -151,7 +148,7 @@ export const deleteClass = async (req: Request, res: Response) => {
       return;
     }
 
-    // Then delete the class
+    // Дараа нь ангийг устга
     await prisma.class.delete({
       where: { id: classId },
     });

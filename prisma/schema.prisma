@@ -3,9 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DIRECT_URL")
 }
 
 model User {
@@ -72,7 +71,6 @@ model Student {
 }
 
 model Class {
-
   id        String    @id @default(uuid())
   name      String
   promoCode String?   @unique
@@ -82,7 +80,6 @@ model Class {
   students  Student[]
   users     User[]    @relation("UserClass")
   posts     Post[]
-
 }
 
 model Attendance {
