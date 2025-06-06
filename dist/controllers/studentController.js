@@ -37,7 +37,8 @@ const updateStudentAvatar = async (req, res) => {
         const { studentId } = req.params;
         const { avatarUrl } = req.body;
         if (!avatarUrl) {
-            return res.status(400).json({ message: "avatarUrl is required" });
+            res.status(400).json({ message: "avatarUrl is required" });
+            return;
         }
         const updatedStudent = await prisma.student.update({
             where: { id: studentId },
