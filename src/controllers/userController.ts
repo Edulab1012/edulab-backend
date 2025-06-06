@@ -9,6 +9,12 @@ export const createUser = async (req: Request, res: Response) => {
     const { username, email, firstName, phoneNumber, password, role, classId } =
       req.body;
 
+    // Add validation for required fields
+    if (!username || !email || !password || !role) {
+      res.status(400).json({ message: "Required fields are missing" });
+      return;
+    }
+
     const existingUser = await prisma.user.findFirst({
       where: { email },
     });
@@ -20,6 +26,7 @@ export const createUser = async (req: Request, res: Response) => {
       return;
     }
 
+    // Now we know username is defined
     const existingUsername = await prisma.user.findUnique({
       where: { username },
     });
@@ -27,7 +34,7 @@ export const createUser = async (req: Request, res: Response) => {
     if (existingUsername) {
       res
         .status(409)
-        .json({ message: " Нэр давхцаж байна. Өөр нэр сонгоно уу." });
+        .json({ message: " Нэр давхцаж байн. Өөр нэр сонгоно уу." });
       return;
     }
 
