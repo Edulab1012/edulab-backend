@@ -22,7 +22,7 @@ export const createUser = async (req: Request, res: Response) => {
     if (existingUser) {
       res
         .status(403)
-        .json({ message: " Имэйл бүртгэгдсэн байна. Нэвтэрнэ үү." });
+        .json({ message: " Имэйл бүртгэгдсэн байна Нэвтэрнэ үү." });
       return;
     }
 
